@@ -1,440 +1,291 @@
-// src/pages/MenuPage.jsx
 import React, { useState, useMemo } from 'react';
+import { 
+  Search, 
+  ChefHat,
+  Globe,
+  Star
+} from 'lucide-react';
 
-const MenuPage = () => {
-  const [activeCategory, setActiveCategory] = useState('soup');
+// --- FULL DATASET ---
+const MENU_DATA = [
+  {
+    id: 'soup',
+    title: { tr: 'GÜNÜN ÇORBASI', en: 'Soup of the Day', nl: 'Soep van de Dag' },
+    items: [{ name: { tr: 'Günün çorbası', en: 'Daily Soup', nl: 'Dagsoep' }, price: 7.50 }]
+  },
+  {
+    id: 'kids',
+    title: { tr: 'ÇOCUK MENÜLERİ', en: 'Kids Menu', nl: 'Kindermenu' },
+    items: [
+      { name: { tr: 'Köfteburger + patates', en: 'Meatball burger + fries', nl: 'Gehaktbal burger + friet' }, price: 9.50 },
+      { name: { tr: 'Kipstick + patates', en: 'Chicken sticks + fries', nl: 'Kipstick + friet' }, price: 9.50 },
+      { name: { tr: 'Nuggets + patates', en: 'Nuggets + fries', nl: 'Nuggets + friet' }, price: 9.50 }
+    ]
+  },
+  {
+    id: 'starters',
+    title: { tr: 'ARA SICAKLAR', en: 'Starters', nl: 'Voorgerechten' },
+    items: [
+      { name: { tr: 'Sigara böreği', en: 'Crispy Rolls', nl: 'Crispy Rolls' }, price: 11.50 },
+      { name: { tr: 'Tereyağında karides', en: 'Shrimp in Butter', nl: 'Garnalen in Boter' }, price: 19.50 },
+      { name: { tr: 'İçli köfte', en: 'Stuffed Bulgur', nl: 'Gevulde Bulgur' }, price: 8.50 },
+      { name: { tr: 'Kalamar tava', en: 'Fried Calamari', nl: 'Gefrituurde Inktvis' }, price: 14.50 },
+      { name: { tr: 'Salyangoz (Escargots)', en: 'Escargots', nl: 'Slakken' }, price: 18.50 }
+    ]
+  },
+  {
+    id: 'meze',
+    title: { tr: 'SOĞUK MEZELER', en: 'Cold Meze', nl: 'Koude Meze' },
+    items: [
+      { name: { tr: 'Les Huîtres / İstiridye (6 adet)', en: 'Oysters (6 pcs)', nl: 'Oesters (6 st)' }, price: 24.00 },
+      { name: { tr: 'Cacık', en: 'Tzatziki', nl: 'Cacık' }, price: 7.50 },
+      { name: { tr: 'Haydari', en: 'Haydari', nl: 'Haydari' }, price: 7.50 },
+      { name: { tr: 'Antep ezme', en: 'Spicy Walnut Dip', nl: 'Spicy Dip' }, price: 7.50 },
+      { name: { tr: 'Humus', en: 'Hummus', nl: 'Hummus' }, price: 7.50 },
+      { name: { tr: 'Barbunya pilaki', en: 'Pinto Beans', nl: 'Pinto Bonen' }, price: 8.50 },
+      { name: { tr: 'Şakşuka', en: 'Veggie Medley', nl: 'Saksuka' }, price: 8.50 },
+      { name: { tr: 'Atom', en: 'Yogurt with Dried Chilies', nl: 'Hete Yogurt' }, price: 8.50 },
+      { name: { tr: 'Yaprak sarma', en: 'Stuffed Leaves', nl: 'Gevulde Bladeren' }, price: 8.50 },
+      { name: { tr: 'Rus salatası', en: 'Russian Salad', nl: 'Russische Salade' }, price: 9.50 },
+      { name: { tr: 'Peynir tabağı', en: 'Cheese Plate', nl: 'Kaasplank' }, price: 18.50 },
+      { name: { tr: 'Karışık meze tabağı', en: 'Mixed Meze Plate', nl: 'Gemengde Meze' }, price: 19.50 }
+    ]
+  },
+  {
+    id: 'salads',
+    title: { tr: 'SALATALAR', en: 'Salads', nl: 'Salades' },
+    items: [
+      { name: { tr: 'Somon Salatası', en: 'Salmon Salad', nl: 'Zalm Salade' }, price: 22.50 },
+      { name: { tr: 'Feta Salatası', en: 'Feta Salad', nl: 'Feta Salade' }, price: 17.50 },
+      { name: { tr: 'Mevsim Salatası', en: 'Seasonal Salad', nl: 'Seizoenssalade' }, price: 8.50 },
+      { name: { tr: 'Çoban Salatası', en: 'Shepherd Salad', nl: 'Herderssalade' }, price: 9.50 },
+      { name: { tr: 'Muhabbet Special Salata', en: 'Special House Salad', nl: 'Speciale Salade' }, price: 24.50 }
+    ]
+  },
+  {
+    id: 'grill',
+    title: { tr: 'IZGARA & KEBAPLAR', en: 'Grill & Kebabs', nl: 'Grill & Kebabs' },
+    note: { tr: '(Pilav / patates / püre ile servis edilir)', en: '(Served with rice / fries / puree)', nl: '(Geserveerd met rijst / friet / puree)' },
+    items: [
+      { name: { tr: 'Et şiş', en: 'Beef Skewers', nl: 'Runderspies' }, price: 26.50 },
+      { name: { tr: 'Tavuk şiş', en: 'Chicken Skewers', nl: 'Kippenspies' }, price: 22.50 },
+      { name: { tr: 'Adana kebap', en: 'Spicy Minced Skewer', nl: 'Pittige Gehaktspies' }, price: 24.50 },
+      { name: { tr: 'Urfa kebap', en: 'Mild Minced Skewer', nl: 'Milde Gehaktspies' }, price: 23.50 },
+      { name: { tr: 'Çökertme kebabı', en: 'Beef over Crispy Potatoes', nl: 'Cokertme Kebab' }, price: 28.50 },
+      { name: { tr: 'Beyti sarma', en: 'Wrapped Kebab', nl: 'Beyti Sarma' }, price: 26.50 },
+      { name: { tr: 'Ali Nazik (kuzu)', en: 'Lamb over Eggplant', nl: 'Ali Nazik (lam)' }, price: 29.50 },
+      { name: { tr: 'Pirzola', en: 'Lamb Chops', nl: 'Lamskoteletten' }, price: 29.50 },
+      { name: { tr: 'Madalyon şiş', en: 'Medallion Skewers', nl: 'Medaillon Spies' }, price: 29.50 },
+      { name: { tr: 'Izgara köfte', en: 'Grilled Meatballs', nl: 'Gegrilde Gehaktballen' }, price: 21.50 },
+      { name: { tr: 'Tavuk kanat', en: 'Chicken Wings', nl: 'Kippenvleugels' }, price: 22.50 },
+      { name: { tr: 'Antrikot', en: 'Rib-eye Steak', nl: 'Antricote' }, price: 34.50 },
+      { name: { tr: 'Karışık izgara', en: 'Mixed Grill', nl: 'Mixed Grill' }, price: 34.50 }
+    ]
+  },
+  {
+    id: 'fish',
+    title: { tr: 'BALIKLAR', en: 'Fish', nl: 'Visgerechten' },
+    items: [
+      { name: { tr: 'Levrek', en: 'Sea Bass', nl: 'Zeebaars' }, price: 29.50 },
+      { name: { tr: 'Çipura', en: 'Sea Bream', nl: 'Dorade' }, price: 27.50 },
+      { name: { tr: 'Somon', en: 'Salmon', nl: 'Zalm' }, price: 28.50 },
+      { name: { tr: 'Ton şiş / Tuna', en: 'Tuna Skewers', nl: 'Tonijnspies' }, price: 27.50 },
+      { name: { tr: 'Dil balığı (Tong)', en: 'Sole Fish', nl: 'Zeetong' }, price: 34.50 }
+    ]
+  },
+  {
+    id: 'octopus',
+    title: { tr: 'AHTAPOT', en: 'Octopus', nl: 'Octopus' },
+    items: [
+      { name: { tr: 'Izgara ahtapot', en: 'Grilled Octopus', nl: 'Gegrilde Octopus' }, price: 32.50 },
+      { name: { tr: 'Patates yatağında ahtapot', en: 'Octopus on Potato Bed', nl: 'Octopus op Aardappelbed' }, price: 34.50 }
+    ]
+  },
+  {
+    id: 'mussels',
+    title: { tr: 'MOULES – MIDYELER', en: 'Mussels', nl: 'Mosselen' },
+    items: [
+      { name: { tr: 'Belçika midyesi', en: 'Belgian Mussels', nl: 'Belgische Mosselen' }, price: 26.50 },
+      { name: { tr: 'Sarımsaklı', en: 'Garlic Mussels', nl: 'Knoflook Mosselen' }, price: 27.50 },
+      { name: { tr: 'Kremalı', en: 'Creamy Mussels', nl: 'Room Mosselen' }, price: 28.50 }
+    ]
+  },
+  {
+    id: 'lobster',
+    title: { tr: 'ISTAKOZ', en: 'Lobster', nl: 'Kreeft' },
+    items: [
+      { name: { tr: 'Izgara istakoz', en: 'Grilled Lobster', nl: 'Gegrilde Kreeft' }, price: 45.00 },
+      { name: { tr: 'Istakoz Thermidor', en: 'Lobster Thermidor', nl: 'Kreeft Thermidor' }, price: 49.00 }
+    ]
+  },
+  {
+    id: 'pasta',
+    title: { tr: 'MAKARNALAR', en: 'Pasta', nl: 'Pasta' },
+    items: [
+      { name: { tr: 'Penne (krema soslu)', en: 'Penne Creamy', nl: 'Penne Roomsaus' }, price: 18.50 },
+      { name: { tr: 'Spaghetti Bolognese', en: 'Spaghetti Bolognese', nl: 'Spaghetti Bolognese' }, price: 19.50 }
+    ]
+  },
+  {
+    id: 'sides',
+    title: { tr: 'YAN LEZZETLER', en: 'Side Dishes', nl: 'Bijgerechten' },
+    items: [
+      { name: { tr: 'Patates kızartması', en: 'Fries', nl: 'Friet' }, price: 5.50 },
+      { name: { tr: 'Patates püresi', en: 'Mashed Potatoes', nl: 'Aardappelpuree' }, price: 6.50 },
+      { name: { tr: 'Pilav', en: 'Rice', nl: 'Rijst' }, price: 5.50 },
+      { name: { tr: 'Izgara sebze', en: 'Grilled Veggies', nl: 'Gegrilde Groenten' }, price: 6.50 }
+    ]
+  },
+  {
+    id: 'desserts',
+    title: { tr: 'TATLILAR', en: 'Desserts', nl: 'Desserts' },
+    items: [
+      { name: { tr: 'Sütlaç', en: 'Rice Pudding', nl: 'Rijstpudding' }, price: 7.50 },
+      { name: { tr: 'Künefe', en: 'Kunefe', nl: 'Kunefe' }, price: 9.50 },
+      { name: { tr: 'Dondurma', en: 'Ice Cream', nl: 'Ijs' }, price: 6.50 }
+    ]
+  },
+  {
+    id: 'raki',
+    title: { tr: 'RAKI', en: 'Raki', nl: 'Raki' },
+    items: [
+      { name: { tr: 'Yeni Raki 35 cl', en: 'Yeni Raki 35 cl', nl: 'Yeni Raki 35 cl' }, price: 45.00 },
+      { name: { tr: 'Yeni Raki 70 cl', en: 'Yeni Raki 70 cl', nl: 'Yeni Raki 70 cl' }, price: 70.00 },
+      { name: { tr: 'Tekirdağ Raki 70 cl', en: 'Tekirdağ Raki 70 cl', nl: 'Tekirdağ Raki 70 cl' }, price: 100.00 },
+      { name: { tr: 'Beylerbeyi Raki 70 cl', en: 'Beylerbeyi Raki 70 cl', nl: 'Beylerbeyi Raki 70 cl' }, price: 120.00 }
+    ]
+  }
+];
+
+const MenuItem = ({ name, price, language }) => (
+  <div className="group py-5 border-b border-zinc-100 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
+    <div className="flex flex-col">
+      <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-zinc-900 leading-none">
+        {name[language]}
+      </h3>
+      <div className="flex gap-2 mt-2 opacity-25 text-[9px] font-sans font-bold uppercase tracking-widest group-hover:opacity-60 transition-opacity">
+        {language !== 'tr' && <span>{name.tr}</span>}
+        {language !== 'en' && <span>{name.en}</span>}
+        {language !== 'nl' && <span>{name.nl}</span>}
+      </div>
+    </div>
+    <div className="flex items-center gap-4 self-end md:self-center">
+      <div className="h-[1px] w-12 bg-zinc-100 group-hover:bg-zinc-900 transition-colors"></div>
+      <span className="text-xl md:text-2xl font-sans font-bold tracking-tighter">
+        {price.toFixed(2)} €
+      </span>
+    </div>
+  </div>
+);
+
+export default function App() {
+  const [lang, setLang] = useState('tr');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // iPhone-style emoji mapping for each category
-  const categoryEmojis = {
-    soup: '🥣',
-    kids: '👶',
-    starters: '🔥',
-    'cold-meze': '🧀',
-    salads: '🥗',
-    grill: '🥩',
-    fish: '🐟',
-    octopus: '🐙',
-    moules: '🦪',
-    lobster: '🦞',
-    paella: '🥘',
-    pasta: '🍝',
-    sides: '🍟',
-    desserts: '🍨',
-    'cold-drinks': '🥤',
-    'hot-drinks': '☕',
-    wines: '🍷',
-    raki: '🥃',
-    mocktails: '🌴',
-    cocktails: '🍸',
-    alcohol: '🍺'
-  };
-
-  // Full menu data with category groupings
-  const menuData = useMemo(() => [
-    {
-      id: 'soup',
-      title: 'GÜNÜN ÇORBASI / Soup of the Day / Soep van de Dag',
-      items: [
-        { name: 'Günün çorbası', price: '7.50 €' }
-      ]
-    },
-    {
-      id: 'kids',
-      title: 'ÇOCUK MENÜLERİ / Kids Menu / Kindermenu',
-      items: [
-        { name: 'Köfteburger + patates', price: '9.50 €' },
-        { name: 'Kipstick + patates', price: '9.50 €' },
-        { name: 'Nuggets + patates', price: '9.50 €' }
-      ]
-    },
-    {
-      id: 'starters',
-      title: 'ARA SICAKLAR / Starters / Voorgerechten',
-      items: [
-        { name: 'Sigara böreği', price: '11.50 €' },
-        { name: 'Tereyağında karides', price: '19.50 €' },
-        { name: 'İçli köfte', price: '8.50 €' },
-        { name: 'Kalamar tava', price: '14.50 €' },
-        { name: 'Salyangoz (Escargots)', price: '18.50 €' }
-      ]
-    },
-    {
-      id: 'cold-meze',
-      title: 'SOĞUK MEZELER / Cold Meze / Koude Meze',
-      items: [
-        { name: 'Les Huîtres / İstiridye (6 adet)', price: '24.00 €' },
-        { name: 'Cacık', price: '7.50 €' },
-        { name: 'Haydari', price: '7.50 €' },
-        { name: 'Antep ezme', price: '7.50 €' },
-        { name: 'Humus', price: '7.50 €' },
-        { name: 'Barbunya pilaki', price: '8.50 €' },
-        { name: 'Şakşuka', price: '8.50 €' },
-        { name: 'Atom', price: '8.50 €' },
-        { name: 'Yaprak sarma', price: '8.50 €' },
-        { name: 'Rus salatası', price: '9.50 €' },
-        { name: 'Peynir tabağı', price: '18.50 €' },
-        { name: 'Karışık meze tabağı', price: '19.50 €' }
-      ]
-    },
-    {
-      id: 'salads',
-      title: 'SALATALAR / Salads / Salades',
-      items: [
-        { name: 'Somon Salatası (Salmon Salad / Zalm Salade)', price: '22.50 €' },
-        { name: 'Feta Salatası (Feta Salad / Feta Salade)', price: '17.50 €' },
-        { name: 'Mevsim Salatası (Seasonal Salad)', price: '8.50 €' },
-        { name: 'Çoban Salatası (Shepherd Salad)', price: '9.50 €' },
-        { name: 'Muhabbet Special Salata', price: '24.50 €' }
-      ]
-    },
-    {
-      id: 'grill',
-      title: 'IZGARA & KEBAPLAR / Grill & Kebabs',
-      subtitle: '(Pilav / patates / püre ile servis edilir)',
-      items: [
-        { name: 'Et şiş', price: '26.50 €' },
-        { name: 'Tavuk şiş', price: '22.50 €' },
-        { name: 'Adana kebap', price: '24.50 €' },
-        { name: 'Urfa kebap', price: '23.50 €' },
-        { name: 'Çökertme kebabı', price: '28.50 €' },
-        { name: 'Beyti sarma', price: '26.50 €' },
-        { name: 'Ali Nazik (kuzu)', price: '29.50 €' },
-        { name: 'Pirzola', price: '29.50 €' },
-        { name: 'Madalyon şiş', price: '29.50 €' },
-        { name: 'Izgara köfte', price: '21.50 €' },
-        { name: 'Tavuk kanat', price: '22.50 €' },
-        { name: 'Ciğer şiş', price: '22.50 €' },
-        { name: 'Antrikot', price: '34.50 €' },
-        { name: 'Karışık izgara', price: '34.50 €' },
-        { name: 'Sac tava', price: '26.50 €' },
-        { name: 'Fırında güveç', price: '26.50 €' }
-      ]
-    },
-    {
-      id: 'fish',
-      title: 'BALIKLAR / Fish / Visgerechten',
-      items: [
-        { name: 'Levrek', price: '29.50 €' },
-        { name: 'Çipura', price: '27.50 €' },
-        { name: 'Somon', price: '28.50 €' },
-        { name: 'Ton şiş / Tuna', price: '27.50 €' },
-        { name: 'Mezgit', price: '26.50 €' },
-        { name: 'Dil balığı (Tong)', price: '34.50 €' },
-        { name: 'Közde Seksi 5', price: '25.00 €' }
-      ]
-    },
-    {
-      id: 'octopus',
-      title: 'AHTAPOT / Octopus',
-      items: [
-        { name: 'Izgara ahtapot', price: '32.50 €' },
-        { name: 'Patates yatağında ahtapot', price: '34.50 €' },
-        { name: 'Ahtapot tava', price: '31.50 €' }
-      ]
-    },
-    {
-      id: 'moules',
-      title: 'MOULES – MIDYELER',
-      items: [
-        { name: 'Belçika midyesi', price: '26.50 €' },
-        { name: 'Sarımsaklı', price: '27.50 €' },
-        { name: 'Kremalı', price: '28.50 €' },
-        { name: 'Cozze alla Tarantina', price: '26.50 €' }
-      ]
-    },
-    {
-      id: 'lobster',
-      title: 'ISTAKOZ / Lobster / Kreeft',
-      items: [
-        { name: 'Izgara istakoz', price: '45.00 €' },
-        { name: 'Istakoz Thermidor', price: '49.00 €' },
-        { name: 'Sarımsaklı istakoz tava', price: '47.00 €' }
-      ]
-    },
-    {
-      id: 'paella',
-      title: 'PAELLA',
-      items: [
-        { name: 'Balıklı Paella (1 kişilik)', price: '29.50 €' },
-        { name: 'Balıklı Paella (2 kişilik)', price: '55.00 €' }
-      ]
-    },
-    {
-      id: 'pasta',
-      title: 'MAKARNALAR / Pasta',
-      items: [
-        { name: 'Penne (krema soslu)', price: '18.50 €' },
-        { name: 'Spaghetti Bolognese', price: '19.50 €' }
-      ]
-    },
-    {
-      id: 'sides',
-      title: 'YAN LEZZETLER / Side Dishes / Bijgerechten',
-      items: [
-        { name: 'Patates kızartması', price: '5.50 €' },
-        { name: 'Patates püresi', price: '6.50 €' },
-        { name: 'Pilav', price: '5.50 €' },
-        { name: 'Izgara sebze', price: '6.50 €' },
-        { name: 'Fırında kuşkonmaz', price: '8.50 €' }
-      ]
-    },
-    {
-      id: 'desserts',
-      title: 'TATLILAR / Desserts',
-      items: [
-        { name: 'Sütlaç', price: '7.50 €' },
-        { name: 'Künefe', price: '9.50 €' },
-        { name: 'Dondurma (çeşitli)', price: '6.50 €' },
-        { name: 'Çilek Mousse', price: '7.50 €' }
-      ]
-    },
-    {
-      id: 'cold-drinks',
-      title: 'SOĞUK İÇECEKLER',
-      items: [
-        { name: 'Su / Water', price: '2.00 €' },
-        { name: 'Ayran', price: '2.00 €' },
-        { name: 'Soda', price: '2.50 €' },
-        { name: 'Coca Cola / Zero', price: '2.50 €' },
-        { name: 'Fanta', price: '2.50 €' },
-        { name: 'Sprite', price: '2.50 €' },
-        { name: 'Gazoz', price: '2.50 €' },
-        { name: 'Red Bull', price: '3.00 €' },
-        { name: 'Portakal suyu / Orange juice', price: '2.50 €' }
-      ]
-    },
-    {
-      id: 'hot-drinks',
-      title: 'SICAK İÇECEKLER',
-      items: [
-        { name: 'Çay / Tea', price: '3.00 €' },
-        { name: 'Türk kahvesi', price: '3.50 €' },
-        { name: 'Espresso', price: '3.00 €' },
-        { name: 'Koffie', price: '3.00 €' }
-      ]
-    },
-    {
-      id: 'wines',
-      title: 'ŞARAPLAR – WINES',
-      items: [
-        { name: 'Beyaz şarap (kadeh)', price: '6.50 €' },
-        { name: 'Kırmızı şarap (kadeh)', price: '6.00 €' },
-        { name: 'Roze şarap (kadeh)', price: '6.50 €' },
-        { name: 'Cava (kadeh)', price: '7.00 €' },
-        { name: 'Şarap (şişe)', price: '24.00 €' },
-        { name: 'Cava (şişe)', price: '37.00 €' }
-      ]
-    },
-    {
-      id: 'raki',
-      title: 'RAKI',
-      items: [
-        { name: 'Yeni Raki Duble', price: '6.00 €' },
-        { name: 'Yeni Raki 35 cl', price: '45.00 €' },
-        { name: 'Yeni Raki 70 cl', price: '70.00 €' },
-        { name: 'Tekirdağ Raki Duble', price: '8.00 €' },
-        { name: 'Tekirdağ Raki 35 cl', price: '65.00 €' },
-        { name: 'Tekirdağ Raki 70 cl', price: '100.00 €' },
-        { name: 'Beylerbeyi Raki Duble', price: '8.50 €' },
-        { name: 'Beylerbeyi Raki 35 cl', price: '65.00 €' },
-        { name: 'Beylerbeyi Raki 70 cl', price: '120.00 €' }
-      ]
-    },
-    {
-      id: 'mocktails',
-      title: 'ALKOLSÜZ KOKTEYLLER / Mocktails',
-      items: [
-        { name: 'Strawberry Blue Mocktail', price: '6.00 €' },
-        { name: 'Mojito Mocktail', price: '9.00 €' },
-        { name: 'Virgin Pina Colada', price: '9.00 €' }
-      ]
-    },
-    {
-      id: 'cocktails',
-      title: 'KOKTEYLLER / Cocktails',
-      items: [
-        { name: 'Espresso Martini', price: '12.00 €' },
-        { name: 'Spritz', price: '11.00 €' },
-        { name: 'New York Sour', price: '17.00 €' },
-        { name: 'Pink Lady', price: '9.00 €' }
-      ]
-    },
-    {
-      id: 'alcohol',
-      title: 'ALKOLÜ İÇECEKLER',
-      items: [
-        { name: 'Jupiter / Hoegaarden', price: '3.50 €' },
-        { name: 'Duvel', price: '6.00 €' }
-      ]
-    }
-  ], []);
-
-  // Filter menu items based on search query
-  const filteredMenu = useMemo(() => {
-    if (!searchQuery.trim()) return menuData;
-    
-    return menuData.map(category => ({
-      ...category,
-      items: category.items.filter(item => 
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.price.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = useMemo(() => {
+    if (!searchQuery) return MENU_DATA;
+    return MENU_DATA.map(cat => ({
+      ...cat,
+      items: cat.items.filter(item => 
+        item.name.tr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.name.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.name.nl.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    })).filter(category => category.items.length > 0);
-  }, [menuData, searchQuery]);
-
-  // Get active category items
-  const activeItems = useMemo(() => {
-    const category = menuData.find(c => c.id === activeCategory);
-    return category ? category.items : [];
-  }, [activeCategory, menuData]);
-
-  // Category navigation items
-  const categoryNavItems = [
-    { id: 'soup', name: 'SOUP' },
-    { id: 'kids', name: 'KIDS' },
-    { id: 'starters', name: 'STARTERS' },
-    { id: 'cold-meze', name: 'COLD MEZE' },
-    { id: 'salads', name: 'SALADS' },
-    { id: 'grill', name: 'GRILL' },
-    { id: 'fish', name: 'FISH' },
-    { id: 'octopus', name: 'OCTOPUS' },
-    { id: 'moules', name: 'MUSSELS' },
-    { id: 'lobster', name: 'LOBSTER' },
-    { id: 'paella', name: 'PAELLA' },
-    { id: 'pasta', name: 'PASTA' },
-    { id: 'sides', name: 'SIDES' },
-    { id: 'desserts', name: 'DESSERTS' },
-    { id: 'drinks', name: 'DRINKS' }
-  ];
-
-  // Get items for drinks category (aggregates all drink categories)
-  const getDrinkItems = () => [
-    ...menuData.find(c => c.id === 'cold-drinks')?.items || [],
-    ...menuData.find(c => c.id === 'hot-drinks')?.items || [],
-    ...menuData.find(c => c.id === 'wines')?.items || [],
-    ...menuData.find(c => c.id === 'raki')?.items || [],
-    ...menuData.find(c => c.id === 'mocktails')?.items || [],
-    ...menuData.find(c => c.id === 'cocktails')?.items || [],
-    ...menuData.find(c => c.id === 'alcohol')?.items || []
-  ];
-
-  // Get items for current category
-  const getCurrentItems = () => {
-    if (activeCategory === 'drinks') {
-      return getDrinkItems();
-    }
-    return activeItems;
-  };
+    })).filter(cat => cat.items.length > 0);
+  }, [searchQuery]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-gray-900 border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <h1 className="text-4xl font-bold text-center mb-2">OCAKTA MUHABBET</h1>
-          <p className="text-center text-gray-400 mb-6">Turkish • Mediterranean • European</p>
-          
-          {/* Search Bar */}
-          <div className="relative max-w-2xl mx-auto mb-6">
-            <input
+    <div className="min-h-screen bg-white font-serif text-black p-4 md:p-12">
+      
+      {/* Search & Language Controls */}
+      <div className="max-w-[1200px] mx-auto mb-20 flex flex-col md:flex-row gap-8 items-center justify-between">
+         <div className="flex items-center gap-4 bg-zinc-50 p-1.5 rounded-full border border-zinc-100 shadow-sm">
+            {['tr', 'en', 'nl'].map(l => (
+              <button 
+                key={l}
+                onClick={() => setLang(l)}
+                className={`px-5 py-2 rounded-full text-[10px] font-sans font-black uppercase tracking-[0.2em] transition-all ${lang === l ? 'bg-black text-white shadow-md' : 'text-zinc-400 hover:text-black'}`}
+              >
+                {l}
+              </button>
+            ))}
+         </div>
+
+         <div className="relative w-full md:w-96 group">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-black transition-colors" size={20} />
+            <input 
               type="text"
-              placeholder="Search menu items..."
+              placeholder={lang === 'tr' ? 'ARA...' : lang === 'en' ? 'SEARCH...' : 'ZOEKEN...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 pl-12 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-zinc-50 border border-zinc-100 rounded-full py-5 pl-16 pr-8 text-sm italic tracking-[0.2em] outline-none focus:border-black transition-all uppercase"
             />
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-          
-          {/* Category Navigation */}
-          <nav className="flex justify-center overflow-x-auto pb-2">
-            <div className="flex space-x-2 min-w-max">
-              {categoryNavItems.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all duration-300 whitespace-nowrap ${
-                    activeCategory === category.id
-                      ? 'bg-amber-500 text-white shadow-lg'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-800'
-                  }`}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          </nav>
-        </div>
-      </header>
+         </div>
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
-        {/* Menu Items */}
-        <div className="space-y-12">
-          {getCurrentItems().length > 0 ? (
-            getCurrentItems().map((item, index) => (
-              <div 
-                key={index}
-                className="flex items-start border-b border-gray-800 pb-8 last:border-b-0"
-              >
-                {/* Category Emoji */}
-                <div className="w-16 h-16 rounded-xl bg-gray-800 flex items-center justify-center mr-6 flex-shrink-0">
-                  <span className="text-2xl">
-                    {categoryEmojis[activeCategory] || '🍽️'}
-                  </span>
-                </div>
-                
-                {/* Item Details */}
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold mb-2">{item.name}</h2>
-                  <p className="text-3xl font-bold text-amber-400">{item.price}</p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-16">
-              <div className="text-amber-400 mb-4">
-                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">No items found</h3>
-              <p className="text-gray-400">Try searching with different keywords</p>
+      {/* Main Menu Feed */}
+      <main className="max-w-[1200px] mx-auto">
+        {filteredData.length === 0 && (
+          <div className="text-center py-40 border-2 border-dashed border-zinc-100 rounded-3xl">
+            <p className="italic text-2xl text-zinc-300">No dishes found matching your search.</p>
+          </div>
+        )}
+
+        {filteredData.map((cat) => (
+          <section key={cat.id} className="mb-24 animate-fade-in">
+            <div className="flex flex-col md:flex-row md:items-end gap-4 mb-10 border-b-2 border-black pb-6">
+               <div className="flex-grow">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Star size={12} className="text-zinc-300" />
+                    <span className="text-[10px] font-sans font-black uppercase tracking-[0.4em] text-zinc-400">{cat.id}</span>
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter uppercase leading-none">
+                    {cat.title[lang]}
+                  </h2>
+               </div>
+               
+               {cat.note && (
+                 <p className="text-zinc-400 italic text-sm md:text-base md:text-right max-w-xs">
+                    {cat.note[lang]}
+                 </p>
+               )}
             </div>
-          )}
-        </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-16">
+               {cat.items.map((item, idx) => (
+                 <MenuItem 
+                   key={idx} 
+                   name={item.name} 
+                   price={item.price} 
+                   language={lang}
+                 />
+               ))}
+            </div>
+          </section>
+        ))}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 py-12 border-t border-gray-700">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <div className="flex justify-center space-x-6 mb-6">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
-              <span className="text-2xl">📱</span>
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
-              <span className="text-2xl">📸</span>
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
-              <span className="text-2xl">📍</span>
-            </a>
-          </div>
-          
-          <p className="text-gray-400 max-w-2xl mx-auto mb-2">
-            Korte Meer 7, 2000 Antwerpen, Belgium • +32 3 123 45 67
-          </p>
-          <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} OCAKTA MUHABBET Restaurant. All prices in EUR.
-          </p>
-        </div>
-      </footer>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700;1,900&display=swap');
+        
+        body {
+            font-family: 'Playfair Display', serif;
+            background-color: #ffffff;
+            color: #111111;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        ::-webkit-scrollbar {
+          width: 0px; /* Hidden for menu boards */
+        }
+      `}</style>
     </div>
   );
-};
-
-export default MenuPage;
+}
