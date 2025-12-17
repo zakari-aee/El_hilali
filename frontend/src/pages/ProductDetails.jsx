@@ -22,10 +22,6 @@ import perfumeImage from "../../generated_images/elegant_perfume_bottle.png";
 import clipperImage from "../../generated_images/professional_hair_clipper.png";
 import dryerImage from "../../generated_images/professional_hair_dryer.png";
 
-/**
- * PREMIUM PRODUCT DETAILS PAGE
- * Featuring sophisticated typography, bulk ordering logic, and WhatsApp integration.
- */
 
 // Internalized Utility for class names
 const cn = (...classes) => classes.filter(Boolean).join(" ");

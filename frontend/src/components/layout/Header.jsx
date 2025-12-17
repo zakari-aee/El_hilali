@@ -87,7 +87,7 @@ export function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t("search.placeholder")}
-              className={`bg-transparent border-b border-black/10 focus:border-[#C5A27D] py-1 text-[11px] w-32 focus:w-48 transition-all outline-none tracking-widest uppercase font-semibold placeholder:text-black/30 ${dir === 'rtl' ? "text-right" : "text-left"}`}
+              className={`bg-transparent border-b border-black/10 focus:border-[#C5A27D] py-1 text-[11px] w-32 focus:w-48 transition-all outline-none tracking-widest font-semibold placeholder:text-black/30 ${dir === 'rtl' ? "text-right" : "text-left"}`}
             />
             <Search className={`h-4 w-4 text-black/40 absolute ${dir === 'rtl' ? "left-0" : "right-0"}`} />
           </form>
