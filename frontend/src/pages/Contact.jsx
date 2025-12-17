@@ -41,9 +41,10 @@ export default function Contact() {
                       <MapPin className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1">El Hilali Headquarters</p>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1">PARFUMERIE EL HILALI
+</p>
                       <p className="text-black/50 font-medium text-sm leading-relaxed italic font-serif">
-                        123 Luxury Avenue<br/>Beverly Hills, CA 90210
+                        PARFUMERIE EL HILALI<br/>Ryad, Meknès 50050
                       </p>
                     </div>
                   </div>
@@ -54,7 +55,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1">Phone</p>
-                      <p className="text-black/50 font-medium text-sm">+1 (555) 123-4567</p>
+                      <p className="text-black/50 font-medium text-sm">+212 667174694</p>
                     </div>
                   </div>
 
@@ -64,7 +65,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1">Email</p>
-                      <p className="text-black/50 font-medium text-sm">concierge@elhilali.com</p>
+                      <p className="text-black/50 font-medium text-sm">elhilali@gmail.com</p>
                     </div>
                   </div>
                 </div>
@@ -76,15 +77,11 @@ export default function Contact() {
                 <div className="space-y-4 text-sm font-medium">
                   <div className="flex justify-between border-b border-black/5 pb-2">
                     <span className="text-black/40">{t("days.monFri")}</span>
-                    <span className="text-black">10:00 AM — 7:00 PM</span>
+                    <span className="text-black">10:00 AM — 12:00 PM</span>
                   </div>
                   <div className="flex justify-between border-b border-black/5 pb-2">
-                    <span className="text-black/40">{t("days.sat")}</span>
-                    <span className="text-black">11:00 AM — 6:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-black/40">{t("days.sun")}</span>
-                    <span className="text-primary font-bold">{t("status.closed")}</span>
+                    <span className="text-black/40">{t("days.sat")} - {t("days.sun")}</span>
+                    <span className="text-black">10:00 AM — 12:00 PM</span>
                   </div>
                 </div>
               </div>
@@ -103,7 +100,7 @@ export default function Contact() {
                       {t("contact.form.name")}
                     </label>
                     <Input 
-                      placeholder="Jane" 
+                      placeholder="Aicha" 
                       className="rounded-none border-0 border-b border-black/10 focus-visible:ring-0 focus-visible:border-black transition-colors bg-transparent px-0 pb-3 h-auto"
                     />
                   </div>
@@ -112,7 +109,7 @@ export default function Contact() {
                       {t("contact.form.lastName")}
                     </label>
                     <Input 
-                      placeholder="Doe" 
+                      placeholder="El Hilali" 
                       className="rounded-none border-0 border-b border-black/10 focus-visible:ring-0 focus-visible:border-black transition-colors bg-transparent px-0 pb-3 h-auto"
                     />
                   </div>
@@ -124,7 +121,7 @@ export default function Contact() {
                   </label>
                   <Input 
                     type="email" 
-                    placeholder="jane@example.com" 
+                    placeholder="email@example.com" 
                     className="rounded-none border-0 border-b border-black/10 focus-visible:ring-0 focus-visible:border-black transition-colors bg-transparent px-0 pb-3 h-auto"
                   />
                 </div>

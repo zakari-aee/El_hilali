@@ -1,16 +1,16 @@
 import React from "react";
 import { Link } from "wouter";
-import { Facebook, Instagram, Music2, MessageCircle } from "lucide-react";
+import { Facebook, Instagram, Music2, MessageCircle, Target } from "lucide-react";
 import { useLanguage } from "../../lib/i18n";
 
 export function Footer() {
   const { t, dir } = useLanguage();
 
   const socialLinks = [
-    { icon: <Instagram className="h-5 w-5" />, href: "#", label: "Instagram" },
-    { icon: <Facebook className="h-5 w-5" />, href: "#", label: "Facebook" },
-    { icon: <Music2 className="h-5 w-5" />, href: "#", label: "TikTok" },
-    { icon: <MessageCircle className="h-5 w-5" />, href: "#", label: "WhatsApp" },
+    { icon: <Instagram className="h-5 w-5" />, href: "https://www.instagram.com/parfumerieelhilali/" , label: "Instagram"  },
+    { icon: <Facebook className="h-5 w-5" />, href: "/", label: "Facebook" },
+    { icon: <Music2 className="h-5 w-5" />, href: "https://www.tiktok.com/@parfumerieelhilali", label: "TikTok" },
+    { icon: <MessageCircle className="h-5 w-5" />, href: "https://wa.me/212667174694", label: "WhatsApp" },
   ];
 
   const footerLinks = {
@@ -46,6 +46,7 @@ export function Footer() {
                   href={social.href} 
                   aria-label={social.label}
                   className="text-black/40 hover:text-[#C5A27D] transition-colors duration-300"
+                  target="_blank"
                 >
                   {social.icon}
                 </a>
@@ -92,8 +93,7 @@ export function Footer() {
             </h4>
             <address className="not-italic space-y-4">
               <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-                123 Avenue de Luxe<br />
-                Casablanca, Morocco
+                PARFUMERIE EL HILALI<br/>Ryad, Meknès 50050
               </p>
               <a href="mailto:contact@elhilali.com" className="text-[13px] text-black block hover:text-[#C5A27D] transition-colors font-bold underline decoration-black/10 underline-offset-4">
                 contact@elhilali.com
