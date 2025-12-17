@@ -67,8 +67,7 @@ export default function ProductDetails() {
   const handleWhatsAppOrder = () => {
   const finalQuantity = isBulk ? quantity * 12 : quantity;
   const type = isBulk ? "Case(s)" : "Unit(s)";
-  // const message = `Bonjour El Hilali, je souhaite commander: ${finalQuantity} x ${product.name} (${type}). Prix total estimé: $${(currentPrice * quantity).toFixed(2)}`;
-  const message = `aicha ns 39l hahahaha adahk m3ak`;
+  const message = `Bonjour El Hilali, je souhaite commander: ${finalQuantity} x ${product.name} (${type}). Prix total estimé: $${(currentPrice * quantity).toFixed(2)}`;
 
   const encodedMessage = encodeURIComponent(message);
   const phoneNumber = "212657335157";
