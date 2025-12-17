@@ -1,9 +1,41 @@
-export default function App() {
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "./components/ui/toaster";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { LanguageProvider } from "./lib/i18n";
+import NotFound from "./pages/not-found";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import MenuPage from "./pages/MenuPage";
+
+function Router() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <h1 className="text-4xl font-extrabold text-orange-500">
-        Tailwind v3 + React + Vite ✅
-      </h1>
-    </div>
-  )
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route path="/products" component={Products} />
+      <Route path="/product/:id" component={ProductDetails} />
+      <Route path="/about" component={About} />
+      <Route path="/contact" component={Contact} />
+      <Route component={NotFound} />
+    </Switch>
+  );
 }
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
