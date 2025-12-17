@@ -65,12 +65,21 @@ export default function ProductDetails() {
   const currentPrice = isBulk ? product.price * 0.85 : product.price;
 
   const handleWhatsAppOrder = () => {
-    const finalQuantity = isBulk ? quantity * 12 : quantity;
-    const type = isBulk ? "Case(s)" : "Unit(s)";
-    const message = `Bonjour El Hilali, je souhaite commander: ${finalQuantity} x ${product.name} (${type}). Prix total estimé: $${(currentPrice * quantity).toFixed(2)}`;
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
-  };
+  const finalQuantity = isBulk ? quantity * 12 : quantity;
+  const type = isBulk ? "Case(s)" : "Unit(s)";
+
+  const message = `Bonjour El Hilali, je souhaite commander: ${finalQuantity} x ${product.name} (${type}). Prix total estimé: $${(currentPrice * quantity).toFixed(2)}`;
+
+  const encodedMessage = encodeURIComponent(message);
+
+  const phoneNumber = "212632837315";
+
+  window.open(
+    `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
+    "_blank"
+  );
+};
+
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
