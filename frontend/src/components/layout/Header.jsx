@@ -4,10 +4,7 @@ import { Menu, Search, Globe, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../lib/i18n";
 
-/**
- * OPTIMIZED PREMIUM HEADER
- * Integrated with external useLanguage hook and Scroll-to-Top behavior.
- */
+
 export function Header() {
   const [location, setLocation] = useLocation();
   const [scrolled, setScrolled] = useState(false);
@@ -15,7 +12,6 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   
-  // Using your requested i18n logic
   const { t, language, setLanguage, dir } = useLanguage();
 
   // Scroll to top whenever the location (URL) changes
@@ -41,7 +37,6 @@ export function Header() {
     if (searchQuery.trim()) setLocation(`/products?search=${encodeURIComponent(searchQuery)}`);
   };
 
-  // Ensure header is solid white on mobile when menu is open OR when scrolled
   const headerBgClass = isMobileMenuOpen || scrolled 
     ? "bg-white py-5 shadow-sm border-black/5" 
     : "bg-transparent py-10 border-transparent";
@@ -62,7 +57,7 @@ export function Header() {
 
         {/* Logo */}
         <div className="flex-1 md:flex-none text-center md:text-left">
-          <Link href="/" className="text-2xl md:text-4xl font-serif font-bold tracking-tight uppercase cursor-pointer">
+          <Link href="/" className="text-1xl md:text-4xl font-serif font-bold tracking-tight uppercase cursor-pointer">
             El Hilali
           </Link>
         </div>
