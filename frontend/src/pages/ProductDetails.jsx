@@ -67,12 +67,9 @@ export default function ProductDetails() {
   const handleWhatsAppOrder = () => {
   const finalQuantity = isBulk ? quantity * 12 : quantity;
   const type = isBulk ? "Case(s)" : "Unit(s)";
-
   const message = `Bonjour El Hilali, je souhaite commander: ${finalQuantity} x ${product.name} (${type}). Prix total estimé: $${(currentPrice * quantity).toFixed(2)}`;
-
   const encodedMessage = encodeURIComponent(message);
-
-  const phoneNumber = "212632837315";
+  const phoneNumber = "212657335157";
 
   window.open(
     `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
