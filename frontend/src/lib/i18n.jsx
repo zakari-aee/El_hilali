@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const translations = {
   en: {
@@ -9,7 +9,8 @@ const translations = {
     "hero.newCollection": "New Collection 2025",
     "hero.title.prefix": "Discover Your",
     "hero.title.suffix": "Inner Radiance",
-    "hero.description": "Experience the perfect blend of nature and science. Premium cosmetics designed to enhance your natural beauty.",
+    "hero.description":
+      "Experience the perfect blend of nature and science. Premium cosmetics designed to enhance your natural beauty.",
     "btn.shopNow": "Shop Now",
     "btn.ourStory": "Our Story",
     "feat.natural": "Natural Ingredients",
@@ -19,21 +20,26 @@ const translations = {
     "feat.quality": "Premium Quality",
     "feat.quality.desc": "Award-winning formulations",
     "home.trending": "Trending Essentials",
-    "home.trending.desc": "Our most loved products, curated just for you. Discover the favorites that everyone is talking about.",
+    "home.trending.desc":
+      "Our most loved products, curated just for you. Discover the favorites that everyone is talking about.",
     "btn.viewAll": "View All Products",
     "home.science": "Science Meets",
     "home.sophistication": "Sophistication",
-    "home.philosophy.desc": "At El Hilali, we believe that true beauty comes from within, but a little help from nature never hurts. Our formulas are crafted with precision, combining potent active ingredients with luxurious textures to transform your daily ritual.",
+    "home.philosophy.desc":
+      "At El Hilali, we believe that true beauty comes from within, but a little help from nature never hurts. Our formulas are crafted with precision, combining potent active ingredients with luxurious textures to transform your daily ritual.",
     "btn.philosophy": "Read Our Philosophy",
-    "footer.desc": "Premium cosmetics designed to enhance your natural beauty with elegance and grace.",
+    "footer.desc":
+      "Premium cosmetics designed to enhance your natural beauty with elegance and grace.",
     "footer.shop": "Shop",
     "footer.company": "Company",
     "footer.newsletter": "Newsletter",
-    "footer.newsletter.desc": "Subscribe to receive updates, access to exclusive deals, and more.",
+    "footer.newsletter.desc":
+      "Subscribe to receive updates, access to exclusive deals, and more.",
     "footer.rights": "El Hilali Cosmetics. All rights reserved.",
     "footer.designed": "Designed with elegance.",
     "shop.collection": "Our Collection",
-    "shop.desc": "Explore our curated selection of premium skincare and beauty essentials, designed to elevate your routine.",
+    "shop.desc":
+      "Explore our curated selection of premium skincare and beauty essentials, designed to elevate your routine.",
     "shop.filters": "Categories",
     "shop.price": "Price Range",
     "shop.reset": "Reset Filters",
@@ -45,15 +51,19 @@ const translations = {
     "product.freeShipping": "Free shipping over $50",
     "product.secureCheckout": "Secure checkout",
     "about.title": "Our Story",
-    "about.hero.desc": "El Hilali is a premium beauty store dedicated to offering you the finest cosmetics and skincare products. Step in to explore, shop, and indulge in luxury beauty.",
+    "about.hero.desc":
+      "El Hilali is a premium beauty store dedicated to offering you the finest cosmetics and skincare products. Step in to explore, shop, and indulge in luxury beauty.",
     "about.standard": "The El Hilali Experience",
-    "about.desc1": "At El Hilali, we curate a wide selection of high-quality beauty and skincare products. From renowned brands to exclusive collections, every item is chosen to enhance your daily beauty routine.",
-    "about.desc2": "Our store is designed to provide a welcoming and elegant shopping experience. We believe in quality, style, and products you can trust.",
+    "about.desc1":
+      "At El Hilali, we curate a wide selection of high-quality beauty and skincare products. From renowned brands to exclusive collections, every item is chosen to enhance your daily beauty routine.",
+    "about.desc2":
+      "Our store is designed to provide a welcoming and elegant shopping experience. We believe in quality, style, and products you can trust.",
     "about.cruelty": "Cruelty Free",
     "about.natural": "Natural Ingredients",
     "contact.title": "Get in Touch",
     "contact.map.title": "Our Location",
-    "contact.desc": "We'd love to hear from you. Whether you have a question about our products, ingredients, or shipping, our team is here to help.",
+    "contact.desc":
+      "We'd love to hear from you. Whether you have a question about our products, ingredients, or shipping, our team is here to help.",
     "contact.visit": "Visit Our Boutique",
     "contact.hours": "Opening Hours",
     "contact.form.title": "Send a Message",
@@ -77,7 +87,26 @@ const translations = {
     "cat.tools": "Tools & Equipment",
     "product.clipper": "Pro Precision Clipper",
     "product.dryer": "Ionic Hair Dryer",
-    "whatsapp.message": "Hello, I would like to order: "
+    "whatsapp.message": "Hello, I would like to order: ",
+
+    "faq.title.small": "Concierge",
+    "faq.title.main": "Frequently Asked",
+    "faq.title.highlight": "Questions",
+    "faq.quote": "Elegance begins with clarity. We are here to guide you.",
+    "faq.q1": "Are your products authentic?",
+    "faq.a1":"Yes. All products sold in our store are 100% authentic and sourced from authorized brands and official distributors.",
+    "faq.q2": "Do you manufacture the products you sell?",
+    "faq.a2":"No. We are a retail store and do not manufacture products. We carefully select products from trusted brands.",
+    "faq.q3": "What are your shipping policies?",
+    "faq.a3":"We offer fast and reliable delivery. Shipping details are shown during checkout.",
+    "faq.q4": "Which payment methods do you accept?",
+    "faq.a4":"We accept secure payment methods including cards and cash on delivery where available.",
+    "faq.q5": "How do returns work?",
+    "faq.a5":"Returns are accepted within 14 days for unopened items in original packaging.",
+    "faq.q6": "Are the cosmetics safe to use?",
+    "faq.a6":"All products comply with safety standards defined by their respective brands.",
+    "faq.q7": "How can I contact customer support?",
+    "faq.a7": "You can contact us via the contact form, WhatsApp, or email.",
   },
   fr: {
     "nav.home": "Accueil",
@@ -87,7 +116,7 @@ const translations = {
     "hero.newCollection": "Nouvelle Collection 2025",
     "hero.title.prefix": "Découvrez Votre",
     "hero.title.suffix": "Éclat Intérieur",
-    "hero.description": "Découvrez le mélange parfait de la nature et de la science. Des cosmétiques haut de gamme conçus pour sublimer votre beauté naturelle.",
+    "hero.description":"Découvrez le mélange parfait de la nature et de la science. Des cosmétiques haut de gamme conçus pour sublimer votre beauté naturelle.",
     "btn.shopNow": "Acheter Maintenant",
     "btn.ourStory": "Notre Histoire",
     "feat.natural": "Ingrédients Naturels",
@@ -97,21 +126,21 @@ const translations = {
     "feat.quality": "Qualité Premium",
     "feat.quality.desc": "Formulations primées",
     "home.trending": "Essentiels Tendance",
-    "home.trending.desc": "Nos produits les plus appréciés, sélectionnés juste pour vous. Découvrez les favoris dont tout le monde parle.",
+    "home.trending.desc":"Nos produits les plus appréciés, sélectionnés juste pour vous. Découvrez les favoris dont tout le monde parle.",
     "btn.viewAll": "Voir Tous les Produits",
     "home.science": "La Science Rencontre",
     "home.sophistication": "Le Sophistication",
-    "home.philosophy.desc": "Chez El Hilali, nous croyons que la vraie beauté vient de l'intérieur, mais un peu d'aide de la nature ne fait jamais de mal. Nos formules sont élaborées avec précision, combinant des ingrédients actifs puissants avec des textures luxueuses.",
+    "home.philosophy.desc":"Chez El Hilali, nous croyons que la vraie beauté vient de l'intérieur, mais un peu d'aide de la nature ne fait jamais de mal. Nos formules sont élaborées avec précision, combinant des ingrédients actifs puissants avec des textures luxueuses.",
     "btn.philosophy": "Lire Notre Philosophie",
     "footer.desc": "Des cosmétiques haut de gamme conçus pour sublimer votre beauté naturelle avec élégance et grâce.",
     "footer.shop": "Boutique",
     "footer.company": "Entreprise",
     "footer.newsletter": "Newsletter",
-    "footer.newsletter.desc": "Abonnez-vous pour recevoir des mises à jour, des offres exclusives, et plus encore.",
+    "footer.newsletter.desc":"Abonnez-vous pour recevoir des mises à jour, des offres exclusives, et plus encore.",
     "footer.rights": "El Hilali Cosmetics. Tous droits réservés.",
     "footer.designed": "Conçu avec élégance.",
     "shop.collection": "Notre Collection",
-    "shop.desc": "Explorez notre sélection de soins et de beauté essentiels, conçus pour élever votre routine.",
+    "shop.desc":"Explorez notre sélection de soins et de beauté essentiels, conçus pour élever votre routine.",
     "shop.filters": "Catégories",
     "shop.price": "Fourchette de Prix",
     "shop.reset": "Réinitialiser",
@@ -123,15 +152,15 @@ const translations = {
     "product.freeShipping": "Livraison gratuite > $50",
     "product.secureCheckout": "Paiement sécurisé",
     "about.title": "Notre Histoire",
-    "about.hero.desc": "El Hilali est une boutique de beauté haut de gamme dédiée à vous offrir les meilleurs produits cosmétiques et soins de la peau. Venez découvrir, acheter et vous offrir le luxe de la beauté.",
+    "about.hero.desc":"El Hilali est une boutique de beauté haut de gamme dédiée à vous offrir les meilleurs produits cosmétiques et soins de la peau. Venez découvrir, acheter et vous offrir le luxe de la beauté.",
     "about.standard": "L'Expérience El Hilali",
-    "about.desc1": "Chez El Hilali, nous sélectionnons une large gamme de produits de beauté et de soins de haute qualité. Des marques renommées aux collections exclusives, chaque article est choisi pour sublimer votre routine quotidienne.",
-    "about.desc2": "Notre boutique est conçue pour offrir une expérience de shopping élégante et accueillante. Nous croyons en la qualité, le style et des produits de confiance.",
+    "about.desc1":"Chez El Hilali, nous sélectionnons une large gamme de produits de beauté et de soins de haute qualité. Des marques renommées aux collections exclusives, chaque article est choisi pour sublimer votre routine quotidienne.",
+    "about.desc2":"Notre boutique est conçue pour offrir une expérience de shopping élégante et accueillante. Nous croyons en la qualité, le style et des produits de confiance.",
     "about.cruelty": "Sans Cruauté",
     "about.natural": "Ingrédients Naturels",
     "contact.title": "Contactez-nous",
     "contact.map.title": "Notre emplacement",
-    "contact.desc": "Nous aimerions avoir de vos nouvelles. Que vous ayez une question sur nos produits ou la livraison, notre équipe est là pour vous aider.",
+    "contact.desc":"Nous aimerions avoir de vos nouvelles. Que vous ayez une question sur nos produits ou la livraison, notre équipe est là pour vous aider.",
     "contact.visit": "Visitez Notre Boutique",
     "contact.hours": "Heures d'Ouverture",
     "contact.form.title": "Envoyer un Message",
@@ -155,7 +184,25 @@ const translations = {
     "cat.tools": "Outils et Équipements",
     "product.clipper": "Tondeuse de Précision Pro",
     "product.dryer": "Sèche-Cheveux Ionique",
-    "whatsapp.message": "Bonjour, je voudrais commander : "
+    "whatsapp.message": "Bonjour, je voudrais commander : ",
+    "faq.title.small": "Conciergerie",
+    "faq.title.main": "Questions",
+    "faq.title.highlight": "Fréquentes",
+    "faq.quote":"L’élégance commence par la clarté. Nous sommes là pour vous guider.",
+    "faq.q1": "Les produits sont-ils authentiques ?",
+    "faq.a1":"Oui. Tous les produits vendus dans notre boutique sont 100 % authentiques et proviennent de marques et de distributeurs officiels.",
+    "faq.q2": "Fabriquez-vous les produits que vous vendez ?",
+    "faq.a2":"Non. Nous sommes une boutique de vente au détail et ne fabriquons pas les produits. Nous sélectionnons des marques de confiance.",
+    "faq.q3": "Quelles sont vos conditions de livraison ?",
+    "faq.a3":"Nous proposons une livraison rapide et fiable. Les détails s’affichent lors du paiement.",
+    "faq.q4": "Quels moyens de paiement acceptez-vous ?",
+    "faq.a4":"Nous acceptons des moyens de paiement sécurisés, y compris les cartes et le paiement à la livraison lorsque disponible.",
+    "faq.q5": "Comment fonctionnent les retours ?",
+    "faq.a5":"Les retours sont acceptés sous 14 jours pour les produits non ouverts et dans leur emballage d’origine.",
+    "faq.q6": "Les produits cosmétiques sont-ils sûrs à utiliser ?",
+    "faq.a6":"Tous les produits respectent les normes de sécurité définies par leurs marques respectives.",
+    "faq.q7": "Comment contacter le service client ?",
+    "faq.a7":"Vous pouvez nous contacter via le formulaire de contact, WhatsApp ou par email.",
   },
   ar: {
     "nav.home": "الرئيسية",
@@ -165,7 +212,7 @@ const translations = {
     "hero.newCollection": "مجموعة جديدة 2025",
     "hero.title.prefix": "اكتشفي",
     "hero.title.suffix": "إشراقتك الداخلية",
-    "hero.description": "جربي المزيج المثالي بين الطبيعة والعلم. مستحضرات تجميل فاخرة مصممة لتعزيز جمالك الطبيعي.",
+    "hero.description":"جربي المزيج المثالي بين الطبيعة والعلم. مستحضرات تجميل فاخرة مصممة لتعزيز جمالك الطبيعي.",
     "btn.shopNow": "تسوقي الآن",
     "btn.ourStory": "قصتنا",
     "feat.natural": "مكونات طبيعية",
@@ -175,21 +222,21 @@ const translations = {
     "feat.quality": "جودة عالية",
     "feat.quality.desc": "تركيبات حائزة على جوائز",
     "home.trending": "المنتجات الأكثر رواجاً",
-    "home.trending.desc": "منتجاتنا الأكثر طلباً، مختارة خصيصاً لك. اكتشفي المفضلات التي يتحدث عنها الجميع.",
+    "home.trending.desc":"منتجاتنا الأكثر طلباً، مختارة خصيصاً لك. اكتشفي المفضلات التي يتحدث عنها الجميع.",
     "btn.viewAll": "عرض كل المنتجات",
     "home.science": "العلم يلتقي",
     "home.sophistication": "بالرقي",
-    "home.philosophy.desc": "في الهلالي، نؤمن بأن الجمال الحقيقي ينبع من الداخل، ولكن القليل من المساعدة من الطبيعة لا يضر أبداً. تركيباتنا مصممة بدقة لتغيير روتينك اليومي.",
+    "home.philosophy.desc":"في الهلالي، نؤمن بأن الجمال الحقيقي ينبع من الداخل، ولكن القليل من المساعدة من الطبيعة لا يضر أبداً. تركيباتنا مصممة بدقة لتغيير روتينك اليومي.",
     "btn.philosophy": "اقرأ فلسفتنا",
-    "footer.desc": "مستحضرات تجميل فاخرة مصممة لتعزيز جمالك الطبيعي بأناقة ورقي.",
+    "footer.desc":"مستحضرات تجميل فاخرة مصممة لتعزيز جمالك الطبيعي بأناقة ورقي.",
     "footer.shop": "المتجر",
     "footer.company": "الشركة",
     "footer.newsletter": "النشرة البريدية",
-    "footer.newsletter.desc": "اشتركي لتلقي التحديثات والوصول إلى العروض الحصرية والمزيد.",
+    "footer.newsletter.desc":"اشتركي لتلقي التحديثات والوصول إلى العروض الحصرية والمزيد.",
     "footer.rights": "مستحضرات الهلالي. جميع الحقوق محفوظة.",
     "footer.designed": "صمم بأناقة.",
     "shop.collection": "مجموعتنا",
-    "shop.desc": "استكشفي مجموعتنا المختارة من العناية بالبشرة والجمال، المصممة للارتقاء بروتينك.",
+    "shop.desc":"استكشفي مجموعتنا المختارة من العناية بالبشرة والجمال، المصممة للارتقاء بروتينك.",
     "shop.filters": "الفئات",
     "shop.price": "نطاق السعر",
     "shop.reset": "إعادة تعيين",
@@ -209,7 +256,7 @@ const translations = {
     "about.natural": "مكونات طبيعية",
     "contact.title": "اتصل بنا",
     "contact.map.title": "موقعنا",
-    "contact.desc": "نود أن نسمع منك. سواء كان لديك سؤال حول منتجاتنا أو مكوناتنا أو الشحن، فريقنا هنا للمساعدة.",
+    "contact.desc":"نود أن نسمع منك. سواء كان لديك سؤال حول منتجاتنا أو مكوناتنا أو الشحن، فريقنا هنا للمساعدة.",
     "contact.visit": "تفضل بزيارة متجرنا",
     "contact.hours": "ساعات العمل",
     "contact.form.title": "أرسل رسالة",
@@ -233,16 +280,35 @@ const translations = {
     "cat.tools": "أدوات ومعدات",
     "product.clipper": "ماكينة حلاقة احترافية",
     "product.dryer": "مجفف شعر أيوني",
-    "whatsapp.message": "مرحبا، أود أن أطلب: "
-  }
+    "whatsapp.message": "مرحبا، أود أن أطلب: ",
+
+    "faq.title.small": "خدمة العملاء",
+    "faq.title.main": "الأسئلة",
+    "faq.title.highlight": "الشائعة",
+    "faq.quote": "الأناقة تبدأ بالوضوح. نحن هنا لإرشادك.",
+    "faq.q1": "هل المنتجات أصلية؟",
+    "faq.a1":"نعم. جميع المنتجات المباعة في متجرنا أصلية 100٪ وموردة من علامات تجارية وموزعين معتمدين.",
+    "faq.q2": "هل تقومون بتصنيع المنتجات التي تبيعونها؟",
+    "faq.a2":"لا. نحن متجر بيع بالتجزئة ولا نقوم بتصنيع المنتجات، بل نختار علامات تجارية موثوقة بعناية.",
+    "faq.q3": "ما هي سياسة التوصيل؟",
+    "faq.a3":"نوفر خدمة توصيل سريعة وموثوقة. تظهر تفاصيل التوصيل أثناء إتمام الطلب.",
+    "faq.q4": "ما طرق الدفع المتاحة؟",
+    "faq.a4":"نقبل وسائل دفع آمنة، بما في ذلك البطاقات والدفع عند الاستلام حيثما كان متاحاً.",
+    "faq.q5": "كيف تتم عملية الإرجاع؟",
+    "faq.a5":"يمكن إرجاع المنتجات خلال 14 يوماً بشرط أن تكون غير مفتوحة وفي عبوتها الأصلية.",
+    "faq.q6": "هل مستحضرات التجميل آمنة للاستخدام؟",
+    "faq.a6":"جميع المنتجات مطابقة لمعايير السلامة التي تحددها العلامات التجارية المصنعة.",
+    "faq.q7": "كيف يمكنني التواصل مع خدمة العملاء؟",
+    "faq.a7":"يمكنك التواصل معنا عبر نموذج الاتصال أو واتساب أو البريد الإلكتروني.",
+  },
 };
 
 const LanguageContext = createContext(undefined);
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState('fr');
+  const [language, setLanguage] = useState("fr");
 
-  const dir = language === 'ar' ? 'rtl' : 'ltr';
+  const dir = language === "ar" ? "rtl" : "ltr";
 
   useEffect(() => {
     document.documentElement.dir = dir;
@@ -263,7 +329,7 @@ export function LanguageProvider({ children }) {
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    throw new Error("useLanguage must be used within a LanguageProvider");
   }
   return context;
 }
