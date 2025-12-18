@@ -20,6 +20,7 @@ import serumImage from "../../generated_images/premium_serum_bottle.png";
 import perfumeImage from "../../generated_images/elegant_perfume_bottle.png";
 import clipperImage from "../../generated_images/professional_hair_clipper.png";
 import FAQ from "./FAQ";
+import WhyChooseUs from "./WhyChooseUs";
 
 const FEATURED_PRODUCTS = [
   { id: "1", name: "Luminous Silk Cream", price: 85.00, category: "Skincare", image: creamImage },
@@ -198,6 +199,7 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <WhyChooseUs />
       <FAQ />
       <Footer />
     </div>

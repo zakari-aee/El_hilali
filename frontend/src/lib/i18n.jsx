@@ -107,6 +107,20 @@ const translations = {
     "faq.a6":"All products comply with safety standards defined by their respective brands.",
     "faq.q7": "How can I contact customer support?",
     "faq.a7": "You can contact us via the contact form, WhatsApp, or email.",
+
+    "why.smallTitle": "Official Distributor",
+    "why.title.main": "Retail Sales",
+    "why.title.highlight": "& Wholesale Prices",
+    "why.description": "The ideal solution for individuals and resellers looking for high-quality products at the best market prices.",
+    "why.feature1.title": "Dual Pricing",
+    "why.feature1.desc": "Enjoy competitive retail prices or benefit from discounted rates when purchasing in bulk.",
+    "why.feature2.title": "Available Stock",
+    "why.feature2.desc": "A wide selection of cosmetic products always in stock and ready for large orders.",
+    "why.feature3.title": "Total Flexibility",
+    "why.feature3.desc": "No minimum order requirement. Buy exactly what you need, from single items to bulk.",
+    "why.feature4.title": "Fast Delivery",
+    "why.feature4.desc": "Optimized logistics to deliver your orders quickly anywhere in Morocco."
+
   },
   fr: {
     "nav.home": "Accueil",
@@ -203,6 +217,20 @@ const translations = {
     "faq.a6":"Tous les produits respectent les normes de sécurité définies par leurs marques respectives.",
     "faq.q7": "Comment contacter le service client ?",
     "faq.a7":"Vous pouvez nous contacter via le formulaire de contact, WhatsApp ou par email.",
+
+    "why.smallTitle": "Distributeur Officiel",
+    "why.title.main": "Vente au Détail",
+    "why.title.highlight": "& Prix de Gros",
+    "why.description": "La solution idéale pour les particuliers et les revendeurs cherchant des produits de qualité supérieure aux meilleurs prix du marché.",
+    "why.feature1.title": "Double Tarification",
+    "why.feature1.desc": "Bénéficiez de prix compétitifs à l'unité ou de tarifs dégressifs avantageux pour vos achats en gros.",
+    "why.feature2.title": "Stock Disponible",
+    "why.feature2.desc": "Une large gamme de produits cosmétiques toujours en stock, prêts pour les commandes volumineuses.",
+    "why.feature3.title": "Flexibilité Totale",
+    "why.feature3.desc": "Aucun minimum de commande. Achetez exactement ce dont vous avez besoin, du détail au gros.",
+    "why.feature4.title": "Livraison Rapide",
+    "why.feature4.desc": "Une logistique optimisée pour livrer vos commandes partout au Maroc dans les meilleurs délais."
+
   },
   ar: {
     "nav.home": "الرئيسية",
@@ -300,6 +328,21 @@ const translations = {
     "faq.a6":"جميع المنتجات مطابقة لمعايير السلامة التي تحددها العلامات التجارية المصنعة.",
     "faq.q7": "كيف يمكنني التواصل مع خدمة العملاء؟",
     "faq.a7":"يمكنك التواصل معنا عبر نموذج الاتصال أو واتساب أو البريد الإلكتروني.",
+
+
+    "why.smallTitle": "موزع معتمد",
+    "why.title.main": "البيع بالتجزئة",
+    "why.title.highlight": "وأسعار الجملة",
+    "why.description": "الحل المثالي للأفراد والتجار الباحثين عن منتجات عالية الجودة بأفضل الأسعار في السوق.",
+    "why.feature1.title": "تسعير مزدوج",
+    "why.feature1.desc": "استفد من أسعار تنافسية للوحدة أو خصومات خاصة عند الشراء بالجملة.",
+    "why.feature2.title": "مخزون متوفر",
+    "why.feature2.desc": "مجموعة واسعة من منتجات التجميل المتوفرة دائمًا وجاهزة للطلبات الكبيرة.",
+    "why.feature3.title": "مرونة كاملة",
+    "why.feature3.desc": "لا يوجد حد أدنى للطلب. اشترِ حسب حاجتك، من القطعة الواحدة إلى الجملة.",
+    "why.feature4.title": "توصيل سريع",
+    "why.feature4.desc": "نظام لوجستي فعال لتوصيل الطلبات بسرعة إلى جميع أنحاء المغرب."
+
   },
 };
 
