@@ -35,7 +35,7 @@ export function ProductCard({ product, className }) {
             {product.name}
           </h3>
           <p className="text-sm font-medium">
-            ${product.price.toFixed(2)}
+            DH {product.price.toFixed(2)}
           </p>
         </CardFooter>
       </Card>
