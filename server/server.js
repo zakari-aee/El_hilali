@@ -323,7 +323,6 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
 
 // ==================== PUBLIC Product Routes ====================
 // GET all products (PUBLIC - No auth required)
-// GET all products (PUBLIC - No auth required)
 app.get('/api/products', async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
