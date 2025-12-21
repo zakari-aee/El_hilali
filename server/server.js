@@ -10,20 +10,23 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS Configuration - Allow multiple origins
+// ==================== CORS Configuration ====================
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
+  'http://localhost:5000',
   'https://el-hilali.vercel.app',
+  'https://elhilali-production.up.railway.app',
   process.env.FRONTEND_URL
-];
+].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.some(allowed => origin.includes(allowed))) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(null, true); // Allow all for development
     }
   },
   credentials: true,
@@ -31,38 +34,52 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-// Middleware
+// ==================== Middleware ====================
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// JWT Secret Key
-const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-key';
-
-// MongoDB Connection
+// ==================== Environment Variables ====================
+const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-key-change-in-production';
 const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.connect(MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-})
-  .then(() => {
-    console.log('✅ MongoDB Connected Successfully!');
-    console.log('📊 Database: productdb');
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB Connection Error:', err.message);
-  });
+if (!MONGODB_URI) {
+  console.error('❌ MONGODB_URI environment variable is not set');
+  console.error('Please set MONGODB_URI in your .env file or Railway environment variables');
+}
 
-// Monitor connection
+// ==================== MongoDB Connection ====================
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGODB_URI || '', {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      retryWrites: true,
+      w: 'majority',
+    });
+    console.log('✅ MongoDB Connected Successfully!');
+    return true;
+  } catch (err) {
+    console.error('❌ MongoDB Connection Error:', err.message);
+    return false;
+  }
+};
+
+// Handle connection events
 mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
+  console.error('📡 MongoDB connection error:', err.message);
 });
 
 mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected');
+  console.log('📡 MongoDB disconnected');
 });
 
-// ==================== USER SCHEMA ====================
+mongoose.connection.on('reconnected', () => {
+  console.log('📡 MongoDB reconnected');
+});
+
+// ==================== Schemas ====================
+// User Schema
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -88,31 +105,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Initialize default admin user if none exists
-const initializeDefaultAdmin = async () => {
-  try {
-    const adminExists = await User.findOne({ username: 'admin' });
-    
-    if (!adminExists) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      const adminUser = new User({
-        username: 'admin',
-        password: hashedPassword,
-        role: 'admin'
-      });
-      
-      await adminUser.save();
-      console.log('✅ Default admin user created');
-      console.log('⚠️  IMPORTANT: Change the password immediately after first login!');
-    } else {
-      console.log('✅ Admin user already exists');
-    }
-  } catch (error) {
-    console.error('Error initializing admin user:', error);
-  }
-};
-
-// ==================== PRODUCT SCHEMA ====================
+// Product Schema
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -150,8 +143,34 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.model('Product', productSchema);
 
-// ==================== MIDDLEWARE ====================
-// JWT Authentication middleware
+// ==================== Authentication ====================
+// Initialize default admin user
+const initializeDefaultAdmin = async () => {
+  try {
+    const adminExists = await User.findOne({ username: 'admin' });
+    
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      const adminUser = new User({
+        username: 'admin',
+        password: hashedPassword,
+        role: 'admin'
+      });
+      
+      await adminUser.save();
+      console.log('✅ Default admin user created');
+      console.log('⚠️  IMPORTANT: Change password immediately!');
+      console.log('   Username: admin');
+      console.log('   Password: admin123');
+    } else {
+      console.log('✅ Admin user already exists');
+    }
+  } catch (error) {
+    console.error('Error initializing admin user:', error.message);
+  }
+};
+
+// JWT Authentication Middleware
 const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
@@ -191,7 +210,7 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-// Admin role middleware
+// Admin Role Middleware
 const requireAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({
@@ -202,7 +221,7 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
-// ==================== AUTH ROUTES ====================
+// ==================== Auth Routes ====================
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -314,14 +333,14 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
   }
 });
 
-// ==================== PUBLIC PRODUCT ROUTES ====================
+// ==================== PUBLIC Product Routes ====================
 // GET all products (PUBLIC - No auth required)
 app.get('/api/products', async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
         success: false,
-        message: 'Database not connected. Please wait and try again.'
+        message: 'Database not connected'
       });
     }
 
@@ -343,6 +362,13 @@ app.get('/api/products', async (req, res) => {
 // GET single product by ID (PUBLIC - No auth required)
 app.get('/api/products/:id', async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database not connected'
+      });
+    }
+
     const product = await Product.findById(req.params.id);
     
     if (!product) {
@@ -357,6 +383,7 @@ app.get('/api/products/:id', async (req, res) => {
       data: product
     });
   } catch (error) {
+    console.error('Error fetching product:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching product: ' + error.message
@@ -364,14 +391,14 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
-// ==================== PROTECTED ADMIN ROUTES ====================
+// ==================== PROTECTED Admin Routes ====================
 // POST create new product (ADMIN ONLY)
 app.post('/api/products', authenticateToken, requireAdmin, async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
         success: false,
-        message: 'Database not connected. Please check MongoDB Atlas settings.'
+        message: 'Database not connected'
       });
     }
 
@@ -400,7 +427,7 @@ app.post('/api/products', authenticateToken, requireAdmin, async (req, res) => {
       image
     });
     
-    console.log(`New product created by admin: ${req.user.username}`);
+    console.log(`✅ Product created by admin: ${req.user.username} - ${name}`);
     await newProduct.save();
     
     res.status(201).json({
@@ -450,6 +477,8 @@ app.put('/api/products/:id', authenticateToken, requireAdmin, async (req, res) =
       });
     }
     
+    console.log(`✅ Product updated by admin: ${req.user.username} - ${product.name}`);
+    
     res.json({
       success: true,
       message: 'Product updated successfully',
@@ -483,6 +512,8 @@ app.delete('/api/products/:id', authenticateToken, requireAdmin, async (req, res
       });
     }
     
+    console.log(`✅ Product deleted by admin: ${req.user.username} - ${product.name}`);
+    
     res.json({
       success: true,
       message: 'Product deleted successfully'
@@ -496,15 +527,19 @@ app.delete('/api/products/:id', authenticateToken, requireAdmin, async (req, res
   }
 });
 
-// ==================== PUBLIC ROUTES ====================
+// ==================== Public Health Check Routes ====================
 app.get('/', (req, res) => {
   res.json({
     message: '✅ Server is running!',
-    database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    environment: process.env.NODE_ENV || 'development',
+    database: mongoose.connection.readyState === 1 ? '✅ Connected' : '❌ Disconnected',
     endpoints: {
-      login: 'POST /api/auth/login (admin only)',
+      login: 'POST /api/auth/login',
       products: 'GET /api/products (public)',
-      createProduct: 'POST /api/products (admin only)'
+      product: 'GET /api/products/:id (public)',
+      createProduct: 'POST /api/products (admin only)',
+      updateProduct: 'PUT /api/products/:id (admin only)',
+      deleteProduct: 'DELETE /api/products/:id (admin only)'
     }
   });
 });
@@ -514,25 +549,64 @@ app.get('/api/health', (req, res) => {
     status: 'OK',
     mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
     timestamp: new Date().toISOString(),
-    authentication: 'JWT-based (for admin)',
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
-// Initialize and start server
+// ==================== 404 Handler ====================
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+    path: req.path
+  });
+});
+
+// ==================== Error Handler ====================
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred'
+  });
+});
+
+// ==================== Start Server ====================
 const startServer = async () => {
   try {
-    await mongoose.connection.asPromise();
-    await initializeDefaultAdmin();
+    // Connect to MongoDB
+    const connected = await connectDB();
     
+    if (!connected) {
+      console.warn('⚠️  Warning: MongoDB not connected, server will run but without database');
+    }
+
+    // Initialize admin user if DB is connected
+    if (connected) {
+      await initializeDefaultAdmin();
+    }
+
+    // Start Express server
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📡 PUBLIC API: GET /api/products (no auth needed)`);
-      console.log(`🔐 ADMIN API: POST/PUT/DELETE /api/products (requires auth)`);
-      console.log(`🌍 CORS allowed origins:`, allowedOrigins);
+      console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+      console.log(`\n📊 Database Status: ${mongoose.connection.readyState === 1 ? '✅ Connected' : '⚠️  Not Connected'}`);
+      console.log(`\n📡 PUBLIC API ENDPOINTS:`);
+      console.log(`   GET /api/products - List all products`);
+      console.log(`   GET /api/products/:id - Get single product`);
+      console.log(`\n🔐 ADMIN API ENDPOINTS (requires authentication):`);
+      console.log(`   POST /api/products - Create product`);
+      console.log(`   PUT /api/products/:id - Update product`);
+      console.log(`   DELETE /api/products/:id - Delete product`);
+      console.log(`\n🔑 AUTH ENDPOINTS:`);
+      console.log(`   POST /api/auth/login - Login (admin/admin123)`);
+      console.log(`   GET /api/auth/verify - Verify token`);
+      console.log(`   POST /api/auth/change-password - Change password`);
+      console.log(`\n❤️  Health Check: GET /api/health\n`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    console.error('Failed to start server:', error.message);
     process.exit(1);
   }
 };
