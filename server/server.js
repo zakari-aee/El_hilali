@@ -10,11 +10,32 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// CORS Configuration - Allow multiple origins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://el-hilali.vercel.app',
+  process.env.FRONTEND_URL
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 
-// JWT Secret Key (store this in environment variables in production)
+// JWT Secret Key
 const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-key';
 
 // MongoDB Connection
@@ -73,7 +94,6 @@ const initializeDefaultAdmin = async () => {
     const adminExists = await User.findOne({ username: 'admin' });
     
     if (!adminExists) {
-      // Create default admin with password: admin123
       const hashedPassword = await bcrypt.hash('admin123', 10);
       const adminUser = new User({
         username: 'admin',
@@ -83,8 +103,7 @@ const initializeDefaultAdmin = async () => {
       
       await adminUser.save();
       console.log('✅ Default admin user created');
-      console.log('👤 Username: admin');
-      console.log('🔑 Password: admin123');
+      console.log('⚠️  IMPORTANT: Change the password immediately after first login!');
     } else {
       console.log('✅ Admin user already exists');
     }
@@ -136,7 +155,7 @@ const Product = mongoose.model('Product', productSchema);
 const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
       return res.status(401).json({
@@ -145,7 +164,6 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    // Verify JWT token
     jwt.verify(token, JWT_SECRET, async (err, user) => {
       if (err) {
         return res.status(403).json({
@@ -154,7 +172,6 @@ const authenticateToken = async (req, res, next) => {
         });
       }
 
-      // Check if user still exists in database
       const dbUser = await User.findById(user.id);
       if (!dbUser) {
         return res.status(403).json({
@@ -186,12 +203,10 @@ const requireAdmin = (req, res, next) => {
 };
 
 // ==================== AUTH ROUTES ====================
-// Login endpoint
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Validation
     if (!username || !password) {
       return res.status(400).json({
         success: false,
@@ -199,7 +214,6 @@ app.post('/api/auth/login', async (req, res) => {
       });
     }
 
-    // Find user
     const user = await User.findOne({ username: username.toLowerCase() });
     if (!user) {
       return res.status(401).json({
@@ -208,7 +222,6 @@ app.post('/api/auth/login', async (req, res) => {
       });
     }
 
-    // Check password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({
@@ -217,7 +230,6 @@ app.post('/api/auth/login', async (req, res) => {
       });
     }
 
-    // Create JWT token
     const token = jwt.sign(
       { 
         id: user._id,
@@ -225,7 +237,7 @@ app.post('/api/auth/login', async (req, res) => {
         role: user.role 
       },
       JWT_SECRET,
-      { expiresIn: '24h' } // Token expires in 24 hours
+      { expiresIn: '24h' }
     );
 
     res.json({
@@ -247,7 +259,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Check auth status (validate token)
 app.get('/api/auth/verify', authenticateToken, (req, res) => {
   res.json({
     success: true,
@@ -260,7 +271,6 @@ app.get('/api/auth/verify', authenticateToken, (req, res) => {
   });
 });
 
-// Change password
 app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -279,7 +289,6 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
       });
     }
 
-    // Verify current password
     const isValidPassword = await bcrypt.compare(currentPassword, req.user.password);
     if (!isValidPassword) {
       return res.status(401).json({
@@ -288,10 +297,7 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
       });
     }
 
-    // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    
-    // Update password
     req.user.password = hashedPassword;
     await req.user.save();
 
@@ -308,9 +314,9 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
   }
 });
 
-// ==================== PROTECTED PRODUCT ROUTES ====================
-// GET all products (protected)
-app.get('/api/products', authenticateToken, requireAdmin, async (req, res) => {
+// ==================== PUBLIC PRODUCT ROUTES ====================
+// GET all products (PUBLIC - No auth required)
+app.get('/api/products', async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
@@ -334,8 +340,8 @@ app.get('/api/products', authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
-// GET single product by ID (protected)
-app.get('/api/products/:id', authenticateToken, requireAdmin, async (req, res) => {
+// GET single product by ID (PUBLIC - No auth required)
+app.get('/api/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     
@@ -358,7 +364,8 @@ app.get('/api/products/:id', authenticateToken, requireAdmin, async (req, res) =
   }
 });
 
-// POST create new product (protected)
+// ==================== PROTECTED ADMIN ROUTES ====================
+// POST create new product (ADMIN ONLY)
 app.post('/api/products', authenticateToken, requireAdmin, async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -370,7 +377,6 @@ app.post('/api/products', authenticateToken, requireAdmin, async (req, res) => {
 
     const { name, singlePrice, bulkPrice, category, description, image } = req.body;
     
-    // Validation
     if (!name || !singlePrice || !bulkPrice || !category || !image) {
       return res.status(400).json({
         success: false,
@@ -411,7 +417,7 @@ app.post('/api/products', authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
-// PUT update product (protected)
+// PUT update product (ADMIN ONLY)
 app.put('/api/products/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -458,7 +464,7 @@ app.put('/api/products/:id', authenticateToken, requireAdmin, async (req, res) =
   }
 });
 
-// DELETE product (protected)
+// DELETE product (ADMIN ONLY)
 app.delete('/api/products/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -491,27 +497,24 @@ app.delete('/api/products/:id', authenticateToken, requireAdmin, async (req, res
 });
 
 // ==================== PUBLIC ROUTES ====================
-// Root route (public)
 app.get('/', (req, res) => {
   res.json({
     message: '✅ Server is running!',
     database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
-    authRequired: true,
     endpoints: {
-      login: 'POST /api/auth/login',
-      products: '/api/products (requires auth)',
-      createProduct: 'POST /api/products (requires auth)'
+      login: 'POST /api/auth/login (admin only)',
+      products: 'GET /api/products (public)',
+      createProduct: 'POST /api/products (admin only)'
     }
   });
 });
 
-// Health check (public)
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
     timestamp: new Date().toISOString(),
-    authentication: 'JWT-based',
+    authentication: 'JWT-based (for admin)',
     uptime: process.uptime()
   });
 });
@@ -519,18 +522,14 @@ app.get('/api/health', (req, res) => {
 // Initialize and start server
 const startServer = async () => {
   try {
-    // Wait for MongoDB connection
     await mongoose.connection.asPromise();
-    
-    // Initialize default admin user
     await initializeDefaultAdmin();
     
-    // Start server
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`🔐 Authentication enabled`);
-      console.log(`🔑 Default admin credentials created`);
-      console.log(`📡 Protected API available at http://localhost:${PORT}/api/products`);
+      console.log(`📡 PUBLIC API: GET /api/products (no auth needed)`);
+      console.log(`🔐 ADMIN API: POST/PUT/DELETE /api/products (requires auth)`);
+      console.log(`🌍 CORS allowed origins:`, allowedOrigins);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
