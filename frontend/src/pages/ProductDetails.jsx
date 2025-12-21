@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
+import { authApi, productApi } from "../lib/api";
 
 // Internalized Utility for class names
 const cn = (...classes) => classes.filter(Boolean).join(" ");
@@ -40,78 +41,10 @@ const Button = ({ children, className, onClick, variant = "primary", size = "md"
   );
 };
 
-// API base URL
-const API_BASE_URL = 'http://localhost:5000/api';
-
-// Fetch product by ID
-const fetchProductById = async (id) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/${id}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching product:', error);
-    throw error;
-  }
-};
-
-// Fallback mock products (in case API fails)
-const MOCK_PRODUCTS = {
-  "1": { 
-    _id: "1", 
-    name: "Luminous Silk Cream", 
-    singlePrice: 85.00, 
-    bulkPrice: 72.25, 
-    category: "Skincare", 
-    description: "A luxurious anti-aging cream that deeply hydrates and revitalizes skin texture. Infused with rare silk proteins and botanical extracts for a radiant, youthful complexion.",
-    image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800"
-  },
-  "2": { 
-    _id: "2", 
-    name: "Radiance Serum Elixir", 
-    singlePrice: 110.00, 
-    bulkPrice: 93.50, 
-    category: "Skincare", 
-    description: "A potent concentrated serum that targets fine lines and uneven tone. Reveals your natural radiance with every drop using advanced molecular technology.",
-    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=800"
-  },
-  "3": { 
-    _id: "3", 
-    name: "Rose Gold Essence", 
-    singlePrice: 145.00, 
-    bulkPrice: 123.25, 
-    category: "Fragrance", 
-    description: "An enchanting blend of Bulgarian rose, warm amber, and white musk. A sophisticated scent designed for the modern muse who commands attention.",
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w-800"
-  },
-  "9": { 
-    _id: "9", 
-    name: "Precision Pro Clipper", 
-    singlePrice: 120.00, 
-    bulkPrice: 102.00, 
-    category: "Tools", 
-    description: "Professional grade hair clipper with titanium-coated blades and a high-torque motor. Ergonomically designed for absolute control and precision.",
-    image: "https://images.unsplash.com/photo-1608111283178-103eb2c0e149?auto=format&fit=crop&q=80&w=800"
-  },
-  "10": { 
-    _id: "10", 
-    name: "Ionic Professional Dryer", 
-    singlePrice: 180.00, 
-    bulkPrice: 153.00, 
-    category: "Tools", 
-    description: "Advanced ionic technology for frizz-free, shiny hair. Features a salon-grade AC motor that is remarkably quiet yet powerful.",
-    image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=800"
-  },
-};
-
 export default function ProductDetails() {
   const [match, params] = useRoute("/product/:id");
   const [quantity, setQuantity] = useState(1);
   const [isBulk, setIsBulk] = useState(false);
-  const [activeImage, setActiveImage] = useState(0);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -125,23 +58,32 @@ export default function ProductDetails() {
       setError(null);
       
       try {
-        // Try to fetch from API first
-        const response = await fetchProductById(params.id);
-        if (response.success) {
+        // Check if user is authenticated
+        const token = localStorage.getItem('authToken');
+        
+        if (!token) {
+          // Auto-login if no token
+          try {
+            const loginResponse = await authApi.login('admin', 'admin123');
+            if (!loginResponse.success) {
+              throw new Error('Auto-login failed');
+            }
+          } catch (loginErr) {
+            console.error('Auto-login error:', loginErr);
+          }
+        }
+
+        // Fetch product from API
+        const response = await productApi.getById(params.id);
+        if (response.success && response.data) {
           setProduct(response.data);
         } else {
-          throw new Error(response.message || 'Product not found in API');
+          throw new Error(response.message || 'Product not found');
         }
       } catch (apiError) {
-        console.warn('API fetch failed, using mock data:', apiError.message);
-        // Fallback to mock data
-        if (MOCK_PRODUCTS[params.id]) {
-          setProduct(MOCK_PRODUCTS[params.id]);
-          setError('Using demo data (API connection issue)');
-        } else {
-          setProduct(MOCK_PRODUCTS["1"]);
-          setError('Product not found. Showing demo product.');
-        }
+        console.error('Error fetching product:', apiError.message);
+        setError('Failed to load product details. Please try again.');
+        setProduct(null);
       } finally {
         setLoading(false);
       }
@@ -200,7 +142,7 @@ Catégorie: ${product.category}`;
     );
   }
 
-  // Error state (but still show product if we have mock data)
+  // Error state
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
@@ -216,7 +158,7 @@ Catégorie: ${product.category}`;
             </button>
             <div className="text-center py-32">
               <p className="text-lg font-serif italic text-black/40 mb-4">
-                Product not found.
+                {error || "Product not found."}
               </p>
               <Button 
                 variant="outline" 
@@ -242,14 +184,6 @@ Catégorie: ${product.category}`;
     e.target.src = "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800";
   };
 
-  // Create image thumbnails (using same image for all, or you can store multiple images in your database)
-  const imageThumbnails = [
-    product.image,
-    "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800"
-  ];
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -266,24 +200,17 @@ Catégorie: ${product.category}`;
             Back to Collection
           </button>
 
-          {/* Error message (if any) */}
-          {error && (
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
-              <p className="text-yellow-700 text-sm">{error}</p>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 xl:gap-24">
             
             {/* Left: Image Gallery */}
-            <div className="lg:col-span-7 flex flex-col md:flex-row-reverse gap-6">
+            <div className="lg:col-span-7 flex flex-col gap-6">
               <div className="flex-1 aspect-[4/5] bg-[#F9F9F9] overflow-hidden relative group">
                 <motion.img 
                   key={product.image}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
-                  src={product.image || imageThumbnails[0]} 
+                  src={product.image} 
                   alt={product.name}
                   className="w-full h-full object-cover"
                   onError={handleImageError}
@@ -291,26 +218,6 @@ Catégorie: ${product.category}`;
                 <button className="absolute top-6 right-6 p-3 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white">
                   <Share2 className="w-4 h-4" />
                 </button>
-              </div>
-              
-              <div className="flex md:flex-col gap-4 overflow-x-auto no-scrollbar md:w-24">
-                {imageThumbnails.map((img, i) => (
-                  <div 
-                    key={i} 
-                    onClick={() => setActiveImage(i)}
-                    className={cn(
-                      "flex-shrink-0 w-20 md:w-full aspect-square bg-[#F9F9F9] cursor-pointer transition-all duration-300 border-2",
-                      activeImage === i ? "border-black" : "border-transparent opacity-60 hover:opacity-100"
-                    )}
-                  >
-                    <img 
-                      src={img} 
-                      alt={`${product.name} view ${i + 1}`}
-                      className="w-full h-full object-cover"
-                      onError={handleImageError}
-                    />
-                  </div>
-                ))}
               </div>
             </div>
 

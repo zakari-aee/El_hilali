@@ -11,24 +11,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ==================== CORS Configuration ====================
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:5000',
-  'https://el-hilali.vercel.app',
-  'https://elhilali-production.up.railway.app',
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.some(allowed => origin.includes(allowed))) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked origin: ${origin}`);
-      callback(null, true); // Allow all for development
-    }
-  },
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -43,24 +27,29 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-key-change-in-production';
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  console.error('❌ MONGODB_URI environment variable is not set');
-  console.error('Please set MONGODB_URI in your .env file or Railway environment variables');
-}
+console.log('🔧 Configuration:');
+console.log('   PORT:', PORT);
+console.log('   MONGODB_URI:', MONGODB_URI ? '✅ Set' : '❌ Not set');
+console.log('   Environment: Local Development\n');
 
 // ==================== MongoDB Connection ====================
 const connectDB = async () => {
   try {
-    await mongoose.connect(MONGODB_URI || '', {
+    await mongoose.connect(MONGODB_URI, {
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
       retryWrites: true,
       w: 'majority',
     });
     console.log('✅ MongoDB Connected Successfully!');
+    console.log('📊 Database: productdb\n');
     return true;
   } catch (err) {
     console.error('❌ MongoDB Connection Error:', err.message);
+    console.error('⚠️  Make sure:');
+    console.error('   1. MongoDB Atlas cluster is running');
+    console.error('   2. MONGODB_URI is correct in .env');
+    console.error('   3. Your IP is whitelisted in MongoDB Atlas\n');
     return false;
   }
 };
@@ -159,11 +148,10 @@ const initializeDefaultAdmin = async () => {
       
       await adminUser.save();
       console.log('✅ Default admin user created');
-      console.log('⚠️  IMPORTANT: Change password immediately!');
       console.log('   Username: admin');
-      console.log('   Password: admin123');
+      console.log('   Password: admin123\n');
     } else {
-      console.log('✅ Admin user already exists');
+      console.log('✅ Admin user already exists\n');
     }
   } catch (error) {
     console.error('Error initializing admin user:', error.message);
@@ -427,7 +415,7 @@ app.post('/api/products', authenticateToken, requireAdmin, async (req, res) => {
       image
     });
     
-    console.log(`✅ Product created by admin: ${req.user.username} - ${name}`);
+    console.log(`✅ Product created: ${name}`);
     await newProduct.save();
     
     res.status(201).json({
@@ -477,7 +465,7 @@ app.put('/api/products/:id', authenticateToken, requireAdmin, async (req, res) =
       });
     }
     
-    console.log(`✅ Product updated by admin: ${req.user.username} - ${product.name}`);
+    console.log(`✅ Product updated: ${product.name}`);
     
     res.json({
       success: true,
@@ -512,7 +500,7 @@ app.delete('/api/products/:id', authenticateToken, requireAdmin, async (req, res
       });
     }
     
-    console.log(`✅ Product deleted by admin: ${req.user.username} - ${product.name}`);
+    console.log(`✅ Product deleted: ${product.name}`);
     
     res.json({
       success: true,
@@ -531,12 +519,11 @@ app.delete('/api/products/:id', authenticateToken, requireAdmin, async (req, res
 app.get('/', (req, res) => {
   res.json({
     message: '✅ Server is running!',
-    environment: process.env.NODE_ENV || 'development',
     database: mongoose.connection.readyState === 1 ? '✅ Connected' : '❌ Disconnected',
     endpoints: {
-      login: 'POST /api/auth/login',
       products: 'GET /api/products (public)',
       product: 'GET /api/products/:id (public)',
+      login: 'POST /api/auth/login',
       createProduct: 'POST /api/products (admin only)',
       updateProduct: 'PUT /api/products/:id (admin only)',
       deleteProduct: 'DELETE /api/products/:id (admin only)'
@@ -548,9 +535,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -568,8 +553,7 @@ app.use((err, req, res, next) => {
   console.error('Server error:', err);
   res.status(500).json({
     success: false,
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred'
+    message: 'Internal server error'
   });
 });
 
@@ -580,7 +564,7 @@ const startServer = async () => {
     const connected = await connectDB();
     
     if (!connected) {
-      console.warn('⚠️  Warning: MongoDB not connected, server will run but without database');
+      console.warn('⚠️  MongoDB not connected - check your connection string and ensure MongoDB Atlas is accessible');
     }
 
     // Initialize admin user if DB is connected
@@ -590,20 +574,18 @@ const startServer = async () => {
 
     // Start Express server
     app.listen(PORT, () => {
-      console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-      console.log(`\n📊 Database Status: ${mongoose.connection.readyState === 1 ? '✅ Connected' : '⚠️  Not Connected'}`);
-      console.log(`\n📡 PUBLIC API ENDPOINTS:`);
-      console.log(`   GET /api/products - List all products`);
-      console.log(`   GET /api/products/:id - Get single product`);
-      console.log(`\n🔐 ADMIN API ENDPOINTS (requires authentication):`);
-      console.log(`   POST /api/products - Create product`);
-      console.log(`   PUT /api/products/:id - Update product`);
-      console.log(`   DELETE /api/products/:id - Delete product`);
-      console.log(`\n🔑 AUTH ENDPOINTS:`);
-      console.log(`   POST /api/auth/login - Login (admin/admin123)`);
-      console.log(`   GET /api/auth/verify - Verify token`);
-      console.log(`   POST /api/auth/change-password - Change password`);
-      console.log(`\n❤️  Health Check: GET /api/health\n`);
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`\n📡 PUBLIC ENDPOINTS:`);
+      console.log(`   GET http://localhost:${PORT}/api/products`);
+      console.log(`   GET http://localhost:${PORT}/api/products/:id`);
+      console.log(`\n🔐 ADMIN ENDPOINTS (requires auth):`);
+      console.log(`   POST http://localhost:${PORT}/api/products`);
+      console.log(`   PUT http://localhost:${PORT}/api/products/:id`);
+      console.log(`   DELETE http://localhost:${PORT}/api/products/:id`);
+      console.log(`\n🔑 LOGIN:`);
+      console.log(`   POST http://localhost:${PORT}/api/auth/login`);
+      console.log(`   Username: admin | Password: admin123`);
+      console.log(`\n❤️  Health: http://localhost:${PORT}/api/health\n`);
     });
   } catch (error) {
     console.error('Failed to start server:', error.message);

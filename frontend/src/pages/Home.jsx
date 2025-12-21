@@ -8,29 +8,52 @@ import {
   Star, 
   Leaf, 
   ShieldCheck, 
-  ArrowLeft 
+  ArrowLeft,
+  Loader2 
 } from "lucide-react";
 import { useLanguage } from "../lib/i18n";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { authApi, productApi } from "../lib/api";
 
 // Assets
 import storeImage from "../../generated_images/store.jpg";
 import creamImage from "../../generated_images/luxury_face_cream_jar.png";
-import serumImage from "../../generated_images/premium_serum_bottle.png";
-import perfumeImage from "../../generated_images/elegant_perfume_bottle.png";
-import clipperImage from "../../generated_images/professional_hair_clipper.png";
 import FAQ from "./FAQ";
 import WhyChooseUs from "./WhyChooseUs";
 
-const FEATURED_PRODUCTS = [
-  { id: "1", name: "Luminous Silk Cream", price: 85.00, category: "Skincare", image: creamImage },
-  { id: "2", name: "Radiance Serum Elixir", price: 110.00, category: "Skincare", image: serumImage },
-  { id: "3", name: "Rose Gold Essence", price: 145.00, category: "Fragrance", image: perfumeImage },
-  { id: "9", name: "Pro Precision Clipper", price: 120.00, category: "Tools", image: clipperImage }
-];
-
 export default function Home() {
   const { t, dir } = useLanguage();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch products on component mount
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch products from API (no auth required)
+      const response = await productApi.getAll();
+      if (response.success && response.data) {
+        // Get first 4 products for featured section
+        setProducts(response.data.slice(0, 4));
+      } else {
+        throw new Error(response.message || 'Failed to fetch products');
+      }
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err.message);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white" dir={dir}>
@@ -157,11 +180,40 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-16">
-              {FEATURED_PRODUCTS.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            {/* Loading State */}
+            {loading ? (
+              <div className="flex items-center justify-center h-80">
+                <div className="text-center">
+                  <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-black/40" />
+                  <p className="text-black/50 font-serif italic">Loading products...</p>
+                </div>
+              </div>
+            ) : products.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-16">
+                {products.map((product) => (
+                  <ProductCard 
+                    key={product._id || product.id} 
+                    product={{
+                      id: product._id || product.id,
+                      name: product.name,
+                      price: product.singlePrice,
+                      bulkPrice: product.bulkPrice,
+                      category: product.category,
+                      image: product.image || `https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800`
+                    }} 
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 border border-dashed border-black/10">
+                <p className="text-lg font-serif italic text-black/40 mb-4">
+                  {error || "No products available"}
+                </p>
+                <Button variant="outline" onClick={fetchProducts}>
+                  Retry Loading
+                </Button>
+              </div>
+            )}
           </div>
         </section>
 
