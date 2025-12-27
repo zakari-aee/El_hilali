@@ -105,7 +105,7 @@ export default function Contact() {
               </h3>
               <div className="relative w-full aspect-square lg:aspect-[4/5] bg-[#F9F9F9] border border-black/5 overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 rounded-sm">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3312.370162590212!2d-5.5536!3d33.8938!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDUzJzM3LjciTiA1wrAzMycxMy4wIlc!5e0!3m2!1sen!2sma!4v1700000000000"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3313.0943091721765!2d-5.5641413!3d33.8614603!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xda05b9d62623d29%3A0xdc4b582ece2151cf!2sPARFUMERIE%20EL%20HILALI!5e0!3m2!1sen!2sma!4v1766837840888!5m2!1sen!2sma"
                   className="absolute inset-0 w-full h-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
