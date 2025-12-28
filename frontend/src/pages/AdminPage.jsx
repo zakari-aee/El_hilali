@@ -577,6 +577,7 @@ export default function AdminPage() {
                     <img
                       src={product.image}
                       alt={product.name}
+                      loading="lazy"
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                       onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=500'; }}
                     />
@@ -731,7 +732,7 @@ export default function AdminPage() {
                     />
                     {imagePreview ? (
                       <div className="relative w-32 h-32 mx-auto">
-                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover shadow-lg" />
+                        <img src={imagePreview} alt="Preview" loading="lazy" className="w-full h-full object-cover shadow-lg" />
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-[10px] font-bold uppercase tracking-widest">
                           {t.changeImage}
                         </div>

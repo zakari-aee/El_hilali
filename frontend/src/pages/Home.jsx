@@ -92,7 +92,8 @@ export default function Home() {
             >
               <div className="relative aspect-[4/5] md:aspect-square overflow-hidden shadow-2xl rounded-sm">
                 <img 
-                  src={storeImage} 
+                  src={storeImage}
+                  loading="lazy"
                   alt="El Hilali Store" 
                   className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-[3000ms]"
                 />
@@ -190,6 +191,7 @@ export default function Home() {
                   <img 
                     src={creamImage} 
                     alt="Premium Cream" 
+                    loading="lazy"
                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
                   />
                 </div>

@@ -16,6 +16,7 @@ export function ProductCard({ product, className }) {
         <CardContent className="p-0 relative aspect-[4/5] overflow-hidden bg-secondary/50 rounded-sm mb-4">
           <img
             src={product.image}
+            loading="lazy"
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
