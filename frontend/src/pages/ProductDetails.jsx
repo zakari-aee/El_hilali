@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { useRoute } from "wouter";
 import { 
   Minus, 
@@ -10,13 +10,13 @@ import {
   ChevronLeft,
   Share2,
   Heart,
-  Loader2
+  AlertCircle
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
-import { authApi, productApi } from "../lib/api";
+import data from "../data/data";
 
 // Internalized Utility for class names
 const cn = (...classes) => classes.filter(Boolean).join(" ");
@@ -45,51 +45,12 @@ export default function ProductDetails() {
   const [match, params] = useRoute("/product/:id");
   const [quantity, setQuantity] = useState(1);
   const [isBulk, setIsBulk] = useState(false);
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Fetch product data when component mounts or when ID changes
-  useEffect(() => {
-    const fetchProduct = async () => {
-      if (!params?.id) return;
-      
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Check if user is authenticated
-        const token = localStorage.getItem('authToken');
-        
-        if (!token) {
-          // Auto-login if no token
-          try {
-            const loginResponse = await authApi.login('admin', 'admin123');
-            if (!loginResponse.success) {
-              throw new Error('Auto-login failed');
-            }
-          } catch (loginErr) {
-            console.error('Auto-login error:', loginErr);
-          }
-        }
-
-        // Fetch product from API
-        const response = await productApi.getById(params.id);
-        if (response.success && response.data) {
-          setProduct(response.data);
-        } else {
-          throw new Error(response.message || 'Product not found');
-        }
-      } catch (apiError) {
-        console.error('Error fetching product:', apiError.message);
-        setError('Failed to load product details. Please try again.');
-        setProduct(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
+  // Find product from local data
+  const product = useMemo(() => {
+    if (!params?.id) return null;
+    const found = data.find(p => (p._id || p.id) == params.id);
+    return found || null;
   }, [params?.id]);
 
   // Handle WhatsApp order
@@ -98,7 +59,9 @@ export default function ProductDetails() {
     
     const finalQuantity = isBulk ? quantity * 12 : quantity;
     const type = isBulk ? "Case(s)" : "Unit(s)";
-    const currentPrice = isBulk ? product.bulkPrice : product.singlePrice;
+    const productPrice = product.singlePrice || product.price || product.pricePerUnit || product.unitPrice || 0;
+    const bulkPrice = product.bulkPrice || productPrice * 0.85;
+    const currentPrice = isBulk ? bulkPrice : productPrice;
     const totalPrice = (currentPrice * quantity).toFixed(2);
     
     const message = `Bonjour El Hilali, je souhaite commander: ${finalQuantity} x ${product.name} (${type}). 
@@ -115,34 +78,7 @@ Catégorie: ${product.category}`;
     );
   };
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white">
-        <Header />
-        <main className="flex-1 pt-32 pb-24 md:pt-48">
-          <div className="container mx-auto px-6 md:px-10">
-            <button 
-              onClick={() => window.history.back()}
-              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-black/40 hover:text-black mb-12 transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Back to Collection
-            </button>
-            <div className="flex items-center justify-center h-96">
-              <div className="text-center">
-                <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-black/40" />
-                <p className="text-black/50 font-serif italic">Loading product details...</p>
-              </div>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  // Error state
+  // Error state - product not found
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
@@ -157,8 +93,11 @@ Catégorie: ${product.category}`;
               Back to Collection
             </button>
             <div className="text-center py-32">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-50 rounded-full mb-4">
+                <AlertCircle className="w-8 h-8 text-red-500" />
+              </div>
               <p className="text-lg font-serif italic text-black/40 mb-4">
-                {error || "Product not found."}
+                Product not found.
               </p>
               <Button 
                 variant="outline" 
@@ -174,9 +113,11 @@ Catégorie: ${product.category}`;
     );
   }
 
-  const currentPrice = isBulk ? product.bulkPrice : product.singlePrice;
+  const productPrice = product.singlePrice || product.price || product.pricePerUnit || product.unitPrice || 0;
+  const bulkPrice = product.bulkPrice || productPrice * 0.85;
+  const currentPrice = isBulk ? bulkPrice : productPrice;
   const discountPercentage = isBulk 
-    ? Math.round(((product.singlePrice - product.bulkPrice) / product.singlePrice) * 100)
+    ? Math.round(((productPrice - bulkPrice) / productPrice) * 100)
     : 0;
 
   // Handle image error
@@ -210,7 +151,7 @@ Catégorie: ${product.category}`;
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
-                  src={product.image} 
+                  src={product.image || "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800"} 
                   alt={product.name}
                   className="w-full h-full object-cover"
                   onError={handleImageError}
@@ -249,20 +190,20 @@ Catégorie: ${product.category}`;
                 <div className="mb-10">
                   <div className="text-3xl font-serif text-black/90 mb-2">
                     DH{currentPrice.toFixed(2)}
-                    {isBulk && product.bulkPrice && (
+                    {isBulk && bulkPrice && (
                       <span className="ml-4 text-[10px] font-bold uppercase tracking-widest text-[#C5A27D] align-middle">
                         {discountPercentage}% Off
                       </span>
                     )}
                   </div>
                   
-                  {isBulk && product.singlePrice && product.bulkPrice && (
+                  {isBulk && productPrice && bulkPrice && (
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-black/40 line-through">
-                        DH{product.singlePrice.toFixed(2)}
+                        DH{productPrice.toFixed(2)}
                       </span>
                       <span className="text-[10px] font-bold uppercase tracking-widest text-[#C5A27D]">
-                        Save DH {(product.singlePrice - product.bulkPrice).toFixed(2)} per unit
+                        Save DH {(productPrice - bulkPrice).toFixed(2)} per unit
                       </span>
                     </div>
                   )}
@@ -274,7 +215,7 @@ Catégorie: ${product.category}`;
 
                 <div className="space-y-8">
                   {/* Order Mode */}
-                  {product.bulkPrice && (
+                  {bulkPrice && (
                     <div className="flex p-1 bg-[#F9F9F9] rounded-sm">
                       <button 
                         onClick={() => setIsBulk(false)}

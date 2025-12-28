@@ -5,56 +5,23 @@ import { Button } from "../components/ui/button";
 import { Slider } from "../components/ui/slider";
 import { Checkbox } from "../components/ui/checkbox";
 import { Label } from "../components/ui/label";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useLanguage } from "../lib/i18n";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, X, Loader2 } from "lucide-react";
-import { productApi } from "../lib/api";
+import { Filter, X } from "lucide-react";
+import data from "../data/data";
 
 export default function Products() {
   const { t, dir } = useLanguage();
   const [location] = useLocation();
-  const [priceRange, setPriceRange] = useState([500]);
+  const [priceRange, setPriceRange] = useState([5000]);
   const [categories, setCategories] = useState([]);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  
-  // State for products from API
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Fetch products on component mount
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await productApi.getAll();
-      if (response.success) {
-        setProducts(response.data);
-      } else {
-        throw new Error(response.message || 'Failed to fetch products');
-      }
-    } catch (err) {
-      console.error('Error fetching products:', err);
-      setError(err.message);
-      // Fallback to mock data if API fails
-      setProducts(getMockProducts());
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fallback mock data (keep your existing mock data as backup)
-  const getMockProducts = () => [
-    { _id: "1", name: "Luminous Silk Cream", singlePrice: 85.00, bulkPrice: 72.25, category: "Skincare", description: "Premium face cream", image: "/api/placeholder/400/500" },
-    { _id: "2", name: "Radiance Serum Elixir", singlePrice: 110.00, bulkPrice: 93.50, category: "Skincare", description: "Anti-aging serum", image: "/api/placeholder/400/500" },
-    // Add more mock products as needed
-  ];
+  // Debug: Check if products are loaded
+  console.log("Products loaded:", data);
+  console.log("Products count:", data?.length || 0);
 
   // Parse search query from URL
   const searchQuery = useMemo(() => {
@@ -70,13 +37,19 @@ export default function Products() {
     );
   };
 
-  const filteredProducts = products.filter(product => {
-    const matchesPrice = product.singlePrice <= priceRange[0];
+  const filteredProducts = data.filter(product => {
+    // Handle multiple price property names
+    const price = product.singlePrice || product.price || product.pricePerUnit || product.unitPrice || 0;
+    const matchesPrice = price <= priceRange[0];
     const matchesCategory = categories.length === 0 || categories.includes(product.category);
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery) || 
+    const matchesSearch = !searchQuery || 
+                         product.name.toLowerCase().includes(searchQuery) || 
                          product.category.toLowerCase().includes(searchQuery);
     return matchesPrice && matchesCategory && matchesSearch;
   });
+
+  console.log("Filtered products:", filteredProducts);
+  console.log("Sample product:", data[0] ? Object.keys(data[0]) : "No products");
 
   const categoryList = [
     { id: "Skincare", label: t("cat.skincare") },
@@ -114,8 +87,8 @@ export default function Products() {
         <h3 className="font-serif font-bold text-xl mb-6 tracking-tight uppercase text-[12px]">{t("shop.price")}</h3>
         <div className="space-y-6 px-1">
           <Slider 
-            defaultValue={[500]} 
-            max={500} 
+            defaultValue={[5000]} 
+            max={5000} 
             step={10} 
             value={priceRange}
             onValueChange={setPriceRange}
@@ -132,7 +105,7 @@ export default function Products() {
           variant="outline" 
           className="w-full text-[10px]"
           onClick={() => {
-            setPriceRange([500]);
+            setPriceRange([5000]);
             setCategories([]);
           }}
         >
@@ -141,50 +114,6 @@ export default function Products() {
       </div>
     </div>
   );
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white" dir={dir}>
-        <Header />
-        <main className="flex-1 pt-32 pb-24 md:pt-40">
-          <div className="container mx-auto px-6 md:px-10 flex items-center justify-center h-96">
-            <div className="text-center">
-              <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-black/40" />
-              <p className="text-black/50 font-serif italic">Loading our luxury collection...</p>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  // Error state
-  if (error && products.length === 0) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white" dir={dir}>
-        <Header />
-        <main className="flex-1 pt-32 pb-24 md:pt-40">
-          <div className="container mx-auto px-6 md:px-10">
-            <div className="text-center py-32 border border-dashed border-black/10">
-              <p className="text-lg font-serif italic text-black/40 mb-4">
-                Connection issue. Using demo products.
-              </p>
-              <p className="text-sm text-black/30 mb-6">{error}</p>
-              <Button 
-                variant="outline" 
-                onClick={fetchProducts}
-              >
-                Retry Connection
-              </Button>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-white" dir={dir}>
@@ -234,19 +163,25 @@ export default function Products() {
             {/* Product Grid */}
             <div className="lg:col-span-9">
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
-                {filteredProducts.map((product) => (
-                  <ProductCard 
-                    key={product._id || product.id} 
-                    product={{
-                      id: product._id || product.id,
-                      name: product.name,
-                      price: product.singlePrice,
-                      bulkPrice: product.bulkPrice,
-                      category: product.category,
-                      image: product.image || `https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800`
-                    }} 
-                  />
-                ))}
+                {filteredProducts.map((product, index) => {
+                  const uniqueKey = product._id || product.id || `product-${index}`;
+                  const price = product.singlePrice || product.price || product.pricePerUnit || product.unitPrice || 0;
+                  const bulkPrice = product.bulkPrice || price * 0.85;
+                  
+                  return (
+                    <ProductCard 
+                      key={uniqueKey}
+                      product={{
+                        id: uniqueKey,
+                        name: product.name || 'Product',
+                        price: price,
+                        bulkPrice: bulkPrice,
+                        category: product.category || 'Uncategorized',
+                        image: product.image || `https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800`
+                      }} 
+                    />
+                  );
+                })}
               </div>
               
               {filteredProducts.length === 0 && (
@@ -258,7 +193,7 @@ export default function Products() {
                     variant="outline" 
                     className="mt-6"
                     onClick={() => {
-                      setPriceRange([500]);
+                      setPriceRange([5000]);
                       setCategories([]);
                     }}
                   >

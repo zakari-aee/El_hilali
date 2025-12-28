@@ -8,13 +8,12 @@ import {
   Star, 
   Leaf, 
   ShieldCheck, 
-  ArrowLeft,
-  Loader2 
+  ArrowLeft
 } from "lucide-react";
 import { useLanguage } from "../lib/i18n";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { authApi, productApi } from "../lib/api";
+import { useMemo } from "react";
+import data from "../data/data";
 
 // Assets
 import storeImage from "../../generated_images/store.jpg";
@@ -24,36 +23,18 @@ import WhyChooseUs from "./WhyChooseUs";
 
 export default function Home() {
   const { t, dir } = useLanguage();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Fetch products on component mount
-  useEffect(() => {
-    fetchProducts();
+  // Get first 4 products from local data
+  const products = useMemo(() => {
+    return data.slice(0, 4).map(product => ({
+      id: product._id || product.id,
+      name: product.name,
+      price: product.singlePrice || product.price || product.pricePerUnit || product.unitPrice || 0,
+      bulkPrice: product.bulkPrice || (product.singlePrice || product.price || product.pricePerUnit || product.unitPrice || 0) * 0.85,
+      category: product.category,
+      image: product.image || `https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800`
+    }));
   }, []);
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Fetch products from API (no auth required)
-      const response = await productApi.getAll();
-      if (response.success && response.data) {
-        // Get first 4 products for featured section
-        setProducts(response.data.slice(0, 4));
-      } else {
-        throw new Error(response.message || 'Failed to fetch products');
-      }
-    } catch (err) {
-      console.error('Error fetching products:', err);
-      setError(err.message);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white" dir={dir}>
@@ -180,38 +161,21 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Loading State */}
-            {loading ? (
-              <div className="flex items-center justify-center h-80">
-                <div className="text-center">
-                  <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-black/40" />
-                  <p className="text-black/50 font-serif italic">Loading products...</p>
-                </div>
-              </div>
-            ) : products.length > 0 ? (
+            {/* Products Grid */}
+            {products.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-16">
-                {products.map((product) => (
+                {products.map((product, index) => (
                   <ProductCard 
-                    key={product._id || product.id} 
-                    product={{
-                      id: product._id || product.id,
-                      name: product.name,
-                      price: product.singlePrice,
-                      bulkPrice: product.bulkPrice,
-                      category: product.category,
-                      image: product.image || `https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800`
-                    }} 
+                    key={product.id || `product-${index}`}
+                    product={product}
                   />
                 ))}
               </div>
             ) : (
               <div className="text-center py-20 border border-dashed border-black/10">
                 <p className="text-lg font-serif italic text-black/40 mb-4">
-                  {error || "No products available"}
+                  No products available
                 </p>
-                <Button variant="outline" onClick={fetchProducts}>
-                  Retry Loading
-                </Button>
               </div>
             )}
           </div>
